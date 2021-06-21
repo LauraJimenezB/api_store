@@ -4,19 +4,31 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { plainToClass } from 'class-transformer';
 import { User } from './entities/users.entity';
 
+export interface userInt {
+  id: number;
+  username: string;
+  password: string;
+  name: string;
+  role: string;
+}
+
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
   private readonly users = [
     {
-      userId: 1,
+      id: 1,
       username: 'john',
       password: 'changeme',
+      name: 'johnC',
+      role: 'client',
     },
     {
-      userId: 2,
+      id: 2,
       username: 'maria',
       password: 'guess',
+      name: 'mariaC',
+      role: 'client',
     },
   ];
 
@@ -25,8 +37,8 @@ export class UsersService {
     return users;
   }
 
-  async getUser(id: number): Promise<User | undefined> {
-    return this.prisma.user.findUnique({ where: { id } });
+  async getUser(username: string): Promise<userInt | undefined> {
+    return this.users.find((user) => user.username === username);
   }
 
   async createUser(user: CreateUserDto): Promise<User> {

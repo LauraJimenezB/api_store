@@ -18,10 +18,10 @@ export class UsersController {
     return this.usersService.getAllUsers();
   }
 
-  @Get(':id')
-  getUser(@Param('id') id: number) {
-    return this.usersService.getUser(Number(id));
-  }
+  /* @Get(':id')
+  getUser(@Param('id') username: string) {
+    return this.usersService.getUser(username);
+  } */
 
   @Post()
   createUser(@Body() body) {
