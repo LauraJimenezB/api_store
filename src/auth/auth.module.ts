@@ -2,9 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
-import { JwtModule, JwtService } from '@nestjs/jwt';
-//import { PrismaService } from 'prisma/migrations/prisma.service';
-import { UsersService } from 'src/users/users.service';
+import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
 
@@ -18,6 +16,6 @@ import { JwtStrategy } from './jwt.strategy';
     }),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
-  exports: [AuthService, LocalStrategy],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
