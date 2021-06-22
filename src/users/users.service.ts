@@ -39,17 +39,10 @@ export class UsersService {
 
   async getUser(username: string): Promise<userInt | undefined> {
     return this.users.find((user) => user.username === username);
-  }
-
-  async createUser(user: CreateUserDto): Promise<User> {
-    const createdUser = await this.prisma.user.create({
-      data: {
-        username: user.username,
-        email: user.email,
-        password: user.password,
-      },
+    /* const users = await this.prisma.user.findUnique({
+      where: { id },
     });
-    return plainToClass(User, createdUser);
+    return users; */
   }
 
   async updateUser(id: number): Promise<User | undefined> {
