@@ -46,7 +46,7 @@ model Book {
   name       String
   authors    String[]
   editorial  String
-  price      Decimal
+  price      Float
   stock      Int
   categoryId Int          @map(name: "category_id")
   favourites Int[]
@@ -91,11 +91,11 @@ model Sale {
 }
 
 model BookSale {
-  id         Int  @id @default(autoincrement())
-  saleId     Int  @map(name: "sale_id")
-  bookId     Int  @map(name: "book_id")
+  id         Int   @id @default(autoincrement())
+  saleId     Int   @map(name: "sale_id")
+  bookId     Int   @map(name: "book_id")
   quantity   Int
-  priceTotal Int  @map(name: "price_total")
-  sale       Sale @relation(fields: [saleId], references: [id])
-  book       Book @relation(fields: [bookId], references: [id])
+  priceTotal Float @map(name: "price_total")
+  sale       Sale  @relation(fields: [saleId], references: [id])
+  book       Book  @relation(fields: [bookId], references: [id])
 }
