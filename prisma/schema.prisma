@@ -19,6 +19,7 @@ model User {
   role  Role  @default(CLIENT)
   createdAt DateTime @default(now())
   confirmedAt DateTime?
+  emailToken  String?
 }
 
 enum Role {

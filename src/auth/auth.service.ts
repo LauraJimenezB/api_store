@@ -6,6 +6,13 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { User } from 'src/users/entities/users.entity';
 import { PrismaService } from '../prisma.service';
 import { plainToClass } from 'class-transformer';
+import * as sendgrid from '@sendgrid/mail';
+
+sendgrid.setApiKey(process.env.API_KEY);
+
+const generateEmailToken = (): string => {
+  return Math.floor(10000000 + Math.random() * 90000000).toString();
+};
 
 @Injectable()
 export class AuthService {
@@ -33,21 +40,35 @@ export class AuthService {
     };
   }
 
+  async sendEmailToken(email: string, emailToken: string): Promise<void> {
+    const msg = {
+      to: email,
+      from: 'hope.acmu@gmail.com', // Use the email address or domain you verified above
+      subject: 'Confirm email',
+      html: `http://localhost:3000/${emailToken}/confirm`,
+    };
+
+    await sendgrid.send(msg);
+  }
+
   async signup(user: CreateUserDto): Promise<string> {
-    await this.prisma.user.create({
+    const emailToken = generateEmailToken();
+    const createdUser = await this.prisma.user.create({
       data: {
         username: user.username,
         email: user.email,
         password: user.password,
+        emailToken: emailToken,
       },
     });
+    await this.sendEmailToken(createdUser.email, emailToken);
     return 'Verify your email';
   }
 
-  async confirm(userId: number): Promise<User> {
-    const createdUser = await this.prisma.user.findUnique({
+  async confirm(token: string): Promise<User> {
+    const createdUser = await this.prisma.user.findFirst({
       where: {
-        id: userId,
+        emailToken: token,
       },
     });
     return plainToClass(User, createdUser);

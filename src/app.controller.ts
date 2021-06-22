@@ -23,7 +23,7 @@ export class AppController {
 
   @Post(':id/confirm')
   confirmEmail(@Param('id') id: string) {
-    return this.authService.confirm(Number(id));
+    return this.authService.confirm(id);
   }
 
   @UseGuards(LocalAuthGuard)

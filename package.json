@@ -36,6 +36,7 @@
     "@nestjs/passport": "^7.1.5",
     "@nestjs/platform-express": "^7.6.15",
     "@prisma/client": "^2.25.0",
+    "@sendgrid/mail": "^7.4.5",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "nestjs-prisma": "^0.11.0",
