@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 //import { PrismaService } from '../../prisma/migrations/prisma.service';
@@ -21,7 +22,7 @@ export class AuthService {
     private jwtService: JwtService,
     private createUserDto: CreateUserDto,
     private prisma: PrismaService,
-  ) {}
+  ) { }
 
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.usersService.getUser(username);
@@ -56,9 +57,10 @@ export class AuthService {
     const createdUser = await this.prisma.user.create({
       data: {
         username: user.username,
+        fullName: 'nombre completo',
         email: user.email,
         password: user.password,
-        emailToken: emailToken,
+        hashActivation: emailToken,
       },
     });
     await this.sendEmailToken(createdUser.email, emailToken);
@@ -68,7 +70,7 @@ export class AuthService {
   async confirm(token: string): Promise<User> {
     const createdUser = await this.prisma.user.findFirst({
       where: {
-        emailToken: token,
+        hashActivation: token,
       },
     });
     return plainToClass(User, createdUser);
