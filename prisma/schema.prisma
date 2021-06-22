@@ -14,7 +14,7 @@ model User {
 
   id             Int        @id @default(autoincrement())
   email          String     @unique
-  nickname       String     @unique
+  username       String     @unique
   fullName       String     @map(name: "full_name")
   password       String
   emailVerified  Boolean    @default(false) @map(name: "email_verified")

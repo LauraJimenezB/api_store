@@ -8,7 +8,7 @@ const roles = [
 const users = [
     {
         email: 'ana@store.com',
-        nickname: 'azevallos',
+        username: 'azevallos',
         fullName: 'Ana Zeballos',
         password: 'contrasena123',
         emailVerified: true,
@@ -16,7 +16,7 @@ const users = [
     },
     {
         email: 'rocio@store.com',
-        nickname: 'rduran',
+        username: 'rduran',
         fullName: 'Rocio Duran',
         password: 'contrasena456',
         emailVerified: true,
@@ -24,7 +24,7 @@ const users = [
     },
     {
         email: 'julio@store.com',
-        nickname: 'jalvarez',
+        username: 'jalvarez',
         fullName: 'Julio Alvarez',
         password: 'contrasena123',
         emailVerified: true,
@@ -32,7 +32,7 @@ const users = [
     },
     {
         email: 'laura@store.com',
-        nickname: 'laura',
+        username: 'laura',
         fullName: 'Laura Jimenez',
         password: 'contrasena456',
         emailVerified: true,
@@ -40,7 +40,7 @@ const users = [
     },
     {
         email: 'edith@store.com',
-        nickname: 'edith',
+        username: 'edith',
         fullName: 'Edith Rivero',
         password: 'contrasena456',
         emailVerified: true,
@@ -48,7 +48,7 @@ const users = [
     },
     {
         email: 'super@store.com',
-        nickname: 'super',
+        username: 'super',
         fullName: 'Super Man',
         password: 'contrasena456',
         emailVerified: true,

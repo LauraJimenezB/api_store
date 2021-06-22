@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Body,
   Controller,
@@ -11,22 +12,17 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Get()
-  getAllUsers() {
-    return this.usersService.getAllUsers();
+  async getAllUsers() {
+    return await this.usersService.getAllUsers();
   }
 
-  @Get(':id')
-  getUser(@Param('id') id: number) {
-    return this.usersService.getUser(Number(id));
-  }
-
-  @Post()
-  createUser(@Body() body) {
-    return this.usersService.createUser(body);
-  }
+  /* @Get(':id')
+  getUser(@Param('id') username: string) {
+    return this.usersService.getUser(username);
+  } */
 
   @Patch(':id')
   updateUser(@Param('id') id: string, @Body() body) {
