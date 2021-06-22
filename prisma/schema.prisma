@@ -11,17 +11,91 @@ generator client {
 }
 
 model User {
-  id    Int     @default(autoincrement()) @id
-  email String  @unique
-  username  String
-  name  String?
-  password String
-  role  Role  @default(CLIENT)
-  createdAt DateTime @default(now())
-  confirmedAt DateTime?
+
+  id             Int        @id @default(autoincrement())
+  email          String     @unique
+  username       String     @unique
+  fullName       String     @map(name: "full_name")
+  password       String
+  emailVerified  Boolean    @default(false) @map(name: "email_verified")
+  hashActivation String
+  active         Boolean    @default(true)
+  createdAt      DateTime   @default(now()) @map(name: "created_at")
+  confirmedAt    DateTime?  @map(name: "confirmed_at")
+  roles          UserRole[]
+  carts          Cart[]
+  sales          Sale[]
 }
 
-enum Role {
-  CLIENT
-  ADMIN
+model Role {
+  id    Int        @id @default(autoincrement())
+  name  String     @unique
+  roles UserRole[]
+}
+
+model UserRole {
+  id     Int  @id @default(autoincrement())
+  userId Int  @map(name: "user_id")
+  roleId Int  @map(name: "role_id")
+  user   User @relation(fields: [userId], references: [id])
+  role   Role @relation(fields: [roleId], references: [id])
+}
+
+model Book {
+  id         Int          @id @default(autoincrement())
+  name       String
+  authors    String[]
+  editorial  String
+  price      Decimal
+  stock      Int
+  categoryId Int          @map(name: "category_id")
+  favourites Int[]
+  bookimages BookImages[]
+  cart       Cart[]
+  sale       Sale[]
+  bookSale   BookSale[]
+  category   Category     @relation(fields: [categoryId], references: [id])
+}
+
+model BookImages {
+  id     Int    @id @default(autoincrement())
+  bookId Int    @map(name: "book_id")
+  path   String
+  book   Book   @relation(fields: [bookId], references: [id])
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  book Book[]
+}
+
+model Cart {
+  id       Int  @id @default(autoincrement())
+  userId   Int  @map(name: "user_id")
+  bookId   Int  @map(name: "book_id")
+  quantity Int
+  user     User @relation(fields: [userId], references: [id])
+  book     Book @relation(fields: [bookId], references: [id])
+}
+
+model Sale {
+  id         Int        @id @default(autoincrement())
+  createdAt  DateTime   @default(now()) @map(name: "created_at")
+  saleStatus String
+  userId     Int        @map(name: "user_id")
+  user       User       @relation(fields: [userId], references: [id])
+  booksales  BookSale[]
+  Book       Book?      @relation(fields: [bookId], references: [id])
+  bookId     Int?
+}
+
+model BookSale {
+  id         Int  @id @default(autoincrement())
+  saleId     Int  @map(name: "sale_id")
+  bookId     Int  @map(name: "book_id")
+  quantity   Int
+  priceTotal Int  @map(name: "price_total")
+  sale       Sale @relation(fields: [saleId], references: [id])
+  book       Book @relation(fields: [bookId], references: [id])
 }

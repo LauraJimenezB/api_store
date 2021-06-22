@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Body,
   Controller,
@@ -11,11 +12,11 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Get()
-  getAllUsers() {
-    return this.usersService.getAllUsers();
+  async getAllUsers() {
+    return await this.usersService.getAllUsers();
   }
 
   /* @Get(':id')
