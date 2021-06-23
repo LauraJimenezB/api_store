@@ -13,15 +13,15 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       super();
   }
 
-  async validate(username: string, password: string, context: ExecutionContext): Promise<any> {
-    const isPublic = this.reflector.get(IS_PUBLIC_KEY, context.getHandler());
-    if (isPublic) {
-      return true;
-    }
+async validate(username: string, password: string): Promise<any> {
+    // const isPublic = this.reflector.get(IS_PUBLIC_KEY, context.getHandler());
+    // if (isPublic) {
+    //   return true;
+    // }
     const user = await this. authService.validateUser(username, password);
 
     if(!user) {
-        throw new UnauthorizedException();
+      throw new UnauthorizedException();
     }
 
     return user;

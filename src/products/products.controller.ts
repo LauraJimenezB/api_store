@@ -1,6 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
+import { CreateProductDto } from './dto/create-product.dto';
 import { ProductsService } from './products.service';
 
 @ApiTags('books')
@@ -17,6 +26,11 @@ export class ProductsController {
   @Get(':id')
   getProduct(@Param('id') id: number) {
     return this.productsService.getProduct(id);
+  }
+
+  @Post()
+  create(@Body() productDto: CreateProductDto) {
+    return this.productsService.createProduct(productDto);
   }
 
   @Patch(':id')

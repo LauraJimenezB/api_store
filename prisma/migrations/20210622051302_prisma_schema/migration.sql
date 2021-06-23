@@ -3,28 +3,26 @@
 
   - You are about to drop the column `confirmedAt` on the `User` table. All the data in the column will be lost.
   - You are about to drop the column `createdAt` on the `User` table. All the data in the column will be lost.
+  - You are about to drop the column `emailToken` on the `User` table. All the data in the column will be lost.
   - You are about to drop the column `name` on the `User` table. All the data in the column will be lost.
   - You are about to drop the column `role` on the `User` table. All the data in the column will be lost.
-  - You are about to drop the column `username` on the `User` table. All the data in the column will be lost.
-  - A unique constraint covering the columns `[nickname]` on the table `User` will be added. If there are existing duplicate values, this will fail.
+  - A unique constraint covering the columns `[username]` on the table `User` will be added. If there are existing duplicate values, this will fail.
   - Added the required column `full_name` to the `User` table without a default value. This is not possible if the table is not empty.
   - Added the required column `hashActivation` to the `User` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `nickname` to the `User` table without a default value. This is not possible if the table is not empty.
 
 */
 -- AlterTable
 ALTER TABLE "User" DROP COLUMN "confirmedAt",
 DROP COLUMN "createdAt",
+DROP COLUMN "emailToken",
 DROP COLUMN "name",
 DROP COLUMN "role",
-DROP COLUMN "username",
 ADD COLUMN     "active" BOOLEAN NOT NULL DEFAULT true,
 ADD COLUMN     "confirmed_at" TIMESTAMP(3),
 ADD COLUMN     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN     "email_verified" BOOLEAN NOT NULL DEFAULT false,
 ADD COLUMN     "full_name" TEXT NOT NULL,
-ADD COLUMN     "hashActivation" TEXT NOT NULL,
-ADD COLUMN     "nickname" TEXT NOT NULL;
+ADD COLUMN     "hashActivation" TEXT NOT NULL;
 
 -- DropEnum
 DROP TYPE "Role";
@@ -54,8 +52,8 @@ CREATE TABLE "Book" (
     "editorial" TEXT NOT NULL,
     "price" DECIMAL(65,30) NOT NULL,
     "stock" INTEGER NOT NULL,
-    "favourites" INTEGER[],
     "category_id" INTEGER NOT NULL,
+    "favourites" INTEGER[],
 
     PRIMARY KEY ("id")
 );
@@ -116,7 +114,7 @@ CREATE UNIQUE INDEX "Role.name_unique" ON "Role"("name");
 CREATE UNIQUE INDEX "Category.name_unique" ON "Category"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User.nickname_unique" ON "User"("nickname");
+CREATE UNIQUE INDEX "User.username_unique" ON "User"("username");
 
 -- AddForeignKey
 ALTER TABLE "UserRole" ADD FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
