@@ -7,14 +7,26 @@ import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { PrismaService } from 'src/prisma.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule,
     UsersModule,
     PassportModule,
-    JwtModule.register({
+    /* JwtModule.register({
       secret: 'SECRET',
       signOptions: { expiresIn: '60s' },
+    }), */
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => {
+        return {
+          secret: configService.get<string>('JWT_SECRET'),
+          signOptions: { expiresIn: '60s' },
+        };
+      },
+      inject: [ConfigService],
     }),
   ],
   providers: [

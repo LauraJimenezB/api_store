@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Body,
   Controller,
@@ -6,16 +7,25 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtStrategy } from 'src/auth/jwt.strategy';
+import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+import { RoleGuard } from './roles/guard/roles.guard';
+import { Roles } from './roles/role.decorator';
 import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Get()
-  getAllUsers() {
-    return this.usersService.getAllUsers();
+  @Roles('MANAGER')
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  async getAllUsers() {
+    return await this.usersService.getAllUsers();
   }
 
   /* @Get(':id')
@@ -31,5 +41,10 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.deleteUser(Number(id));
+  }
+
+  @Post('setRole/:userId/:roleId')
+  setRole(@Param('userId') userId: number, @Param('roleId') roleId: number) {
+    return this.usersService.setRoleToUser(Number(userId), Number(roleId));
   }
 }
