@@ -5,7 +5,7 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { User } from 'src/users/entities/users.entity';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../common/prisma.service';
 import { plainToClass } from 'class-transformer';
 import * as sendgrid from '@sendgrid/mail';
 import * as bcrypt from 'bcrypt';

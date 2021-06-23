@@ -1,48 +1,116 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Decimal } from '@prisma/client/runtime';
 import { plainToClass } from 'class-transformer';
-import { PrismaService } from 'src/prisma.service';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { PrismaService } from '../common/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ReadProductEntity } from './entities/read-product.entity';
 
 @Injectable()
 export class ProductsService {
-    constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
-    async getAllProducts(): Promise<ReadProductEntity[]> {
-        const categories = await this.prisma.category.findMany();
-        const products = await this.prisma.book.findMany();
-        const prods = products.map((prod) => {
-            return {
-                ...prod,
-                favourites: prod.favourites.length,
-                categoryName: categories.filter(
-                    (c) => c.id === prod.categoryId,
-                )[0].name,
-            };
-        });
-        return plainToClass(ReadProductEntity, prods);
+  async getAllProducts(paginationQueryDto: PaginationQueryDto): Promise<any[]> {
+    const { limit, offset } = paginationQueryDto;
+
+    const categories = await this.prisma.category.findMany();
+    const products = await this.prisma.book.findMany({
+      skip: offset,
+      take: limit,
+    });
+    const prods = products.map((prod) => {
+      return {
+        ...prod,
+        favourites: prod.favourites.length,
+        categoryName: categories.filter((c) => c.id === prod.categoryId)[0]
+          .name,
+      };
+    });
+    //plainToClass: error
+    return plainToClass(ReadProductEntity, prods);
+    //return prods;
+  }
+
+  async getProduct(id: number): Promise<any> {
+    const categories = await this.prisma.category.findMany();
+    const product = await this.prisma.book.findUnique({
+      where: { id: id },
+    });
+    const prod = plainToClass(ReadProductEntity, product);
+    prod.favourites = product.favourites.length;
+    prod.categoryName = categories.filter(
+      (c) => c.id === product.categoryId,
+    )[0].name;
+    return prod;
+  }
+
+  async updateProduct(id: number): Promise<ReadProductEntity> {
+    const product = this.prisma.book.findUnique({ where: { id } });
+    return plainToClass(ReadProductEntity, product);
+  }
+
+  async deleteProduct(id: number): Promise<ReadProductEntity> {
+    const product = this.prisma.book.findUnique({ where: { id } });
+    return plainToClass(ReadProductEntity, product);
+  }
+
+  async likeBook(userId: string, productId: number): Promise<any> {
+    const book = await this.prisma.book.findUnique({
+      where: {
+        id: Number(productId),
+      },
+    });
+
+    if (!book) {
+      throw new NotFoundException();
     }
 
-    async getProduct(id: number): Promise<ReadProductEntity> {
-        const categories = await this.prisma.category.findMany();
-        const product = await this.prisma.book.findUnique({
-            where: { id: id },
-        });
-        const prod = plainToClass(ReadProductEntity, product);
-        prod.favourites = product.favourites.length;
-        prod.categoryName = categories.filter(
-            (c) => c.id === product.categoryId,
-        )[0].name;
-        return prod;
+    const alreadyLiked = book.favourites.includes(Number(userId));
+
+    if (alreadyLiked) {
+      return book;
+    }
+    const updatedBook = await this.prisma.book.update({
+      where: {
+        id: Number(productId),
+      },
+      data: {
+        favourites: {
+          push: Number(userId),
+        },
+      },
+    });
+    return updatedBook;
+  }
+
+  async unlikeBook(userId: string, productId: number): Promise<any> {
+    const book = await this.prisma.book.findUnique({
+      where: {
+        id: Number(productId),
+      },
+    });
+
+    if (!book) {
+      throw new NotFoundException();
     }
 
-    async updateProduct(id: number): Promise<ReadProductEntity> {
-        const product = this.prisma.book.findUnique({ where: { id } });
-        return plainToClass(ReadProductEntity, product);
-    }
+    const alreadyLiked = book.favourites.includes(Number(userId));
 
-    async deleteProduct(id: number): Promise<ReadProductEntity> {
-        const product = this.prisma.book.findUnique({ where: { id } });
-        return plainToClass(ReadProductEntity, product);
+    if (alreadyLiked) {
+      const newFavArray = book.favourites.filter(
+        (fav) => fav != Number(userId),
+      );
+
+      const updatedBook = await this.prisma.book.update({
+        where: {
+          id: Number(productId),
+        },
+        data: {
+          favourites: newFavArray,
+        },
+      });
+      return updatedBook;
     }
+    return book;
+  }
 }
