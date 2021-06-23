@@ -1,20 +1,34 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-//import { jwtConstants } from './constants';
+import { IS_PUBLIC_KEY } from 'src/common/decorators/public.decorator';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly configService: ConfigService) {
+export class JwtStrategy
+  extends PassportStrategy(Strategy)
+  implements CanActivate
+{
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly reflector: Reflector,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_SECRET'),
     });
   }
+
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> {
+    const isPublic = this.reflector.get(IS_PUBLIC_KEY, context.getHandler());
+    if (isPublic) {
+      return true;
+    }
+  }
+
   async validate(payload: any) {
-    console.log(payload);
     return {
       id: payload.sub,
       username: payload.username,
