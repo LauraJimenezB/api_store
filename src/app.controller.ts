@@ -21,10 +21,10 @@ export class AppController {
         return this.authService.signup(body);
     }
 
-    @Post(':id/confirm')
-    confirmEmail(@Param('id') id: string) {
-        return this.authService.confirm(Number(id));
-    }
+  @Post(':emailToken/confirm')
+  confirmEmail(@Param('emailToken') emailToken: string) {
+    return this.authService.confirm(emailToken);
+  }
 
     @UseGuards(LocalAuthGuard)
     @Post('login')

@@ -1,9 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { plainToClass } from 'class-transformer';
 import { User } from './entities/users.entity';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
@@ -24,12 +25,6 @@ export class UsersService {
   async getUser(username: string): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: { username: username },
-      select: {
-        email: true,
-        username: true,
-        fullName: true,
-        password: true,
-      },
     });
     return user;
   }
@@ -42,5 +37,41 @@ export class UsersService {
   async deleteUser(id: number): Promise<User> {
     const user = this.prisma.user.findUnique({ where: { id } });
     return user;
+  }
+
+  async setRoleToUser(userId: number, roleId: number) : Promise<User> {
+    const userExists = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if(!userExists) {
+      throw new NotFoundException();
+    }
+
+    const roleExists = await this.prisma.role.findUnique({
+      where: { id: roleId },
+    });
+
+    if(!roleExists) {
+      throw new NotFoundException();
+    }
+
+    const userRoleAlreadySet = await this.prisma.userRole.findFirst({
+      where: { userId, roleId },
+    });
+
+    if (!userRoleAlreadySet) {
+      await this.prisma.userRole.create({
+        data: {
+          userId,
+          roleId
+        },
+      })
+    }
+
+    const updatedUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    return plainToClass(UserDto, updatedUser);
   }
 }
