@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Category } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
-import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
 import { CartItemDto } from './dto/cart-item.dto';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -145,10 +145,10 @@ export class ProductsService {
     return await this.prisma.category.create({ data: { name } });
   }
 
-  async like(userId: string, productId: number): Promise<any> {
+  async like(userId: number, productId: number): Promise<any> {
     const book = await this.prisma.book.findUnique({
       where: {
-        id: Number(productId),
+        id: productId,
       },
     });
 
@@ -163,21 +163,21 @@ export class ProductsService {
     }
     const updatedBook = await this.prisma.book.update({
       where: {
-        id: Number(productId),
+        id: productId,
       },
       data: {
         favourites: {
-          push: Number(userId),
+          push: userId,
         },
       },
     });
     return updatedBook;
   }
 
-  async unlike(userId: string, productId: number): Promise<any> {
+  async unlike(userId: number, productId: number): Promise<any> {
     const book = await this.prisma.book.findUnique({
       where: {
-        id: Number(productId),
+        id: productId,
       },
     });
 
@@ -185,16 +185,14 @@ export class ProductsService {
       throw new NotFoundException();
     }
 
-    const alreadyLiked = book.favourites.includes(Number(userId));
+    const alreadyLiked = book.favourites.includes(userId);
 
     if (alreadyLiked) {
-      const newFavArray = book.favourites.filter(
-        (fav) => fav != Number(userId),
-      );
+      const newFavArray = book.favourites.filter((fav) => fav != userId);
 
       const updatedBook = await this.prisma.book.update({
         where: {
-          id: Number(productId),
+          id: productId,
         },
         data: {
           favourites: newFavArray,
@@ -206,33 +204,36 @@ export class ProductsService {
   }
 
   async addToCart(
-    userId: string,
+    userId: number,
     productId: number,
     quantity: number,
   ): Promise<any> {
     const book = await this.prisma.book.findUnique({
       where: {
-        id: Number(productId),
+        id: productId,
       },
     });
 
     const user = await this.prisma.user.findUnique({
       where: {
-        id: Number(userId),
+        id: userId,
       },
     });
 
-    const item = await this.prisma.cart.create({
+    const priceOfItems = quantity * book.price;
+
+    const item = await this.prisma.cartItem.create({
       data: {
-        userId: Number(userId),
-        bookId: Number(userId),
+        userId: userId,
+        bookId: productId,
+        bookTitle: book.name,
         quantity,
+        price: priceOfItems,
       },
     });
 
     const cartItem = plainToClass(CartItemDto, item);
     cartItem.username = user.username;
-    cartItem.bookTitle = book.name;
     return cartItem;
   }
 }

@@ -1,6 +1,6 @@
 import { Exclude } from 'class-transformer';
 
-export class CartItemDto {
+export class OrderDto {
   @Exclude()
   id: number;
 
@@ -12,6 +12,9 @@ export class CartItemDto {
 
   @Exclude()
   username: string;
+
+  @Exclude()
+  saleId: number;
 
   bookTitle: string;
   quantity: number;

@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -66,11 +67,13 @@ export class ProductsController {
     return this.productsService.enable(bookId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post(':id/like')
   likeBook(@Request() req, @Param('id') bookId: number) {
     return this.productsService.like(req.user.id, bookId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post(':id/unlike')
   unlikeBook(@Request() req, @Param('id') bookId: number) {
     return this.productsService.unlike(req.user.id, bookId);
