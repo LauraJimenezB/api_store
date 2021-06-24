@@ -3,6 +3,7 @@ import { Decimal } from '@prisma/client/runtime';
 import { plainToClass } from 'class-transformer';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { PrismaService } from '../common/prisma.service';
+import { CartItemDto } from './dto/cart-item.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ReadProductEntity } from './entities/read-product.entity';
 
@@ -112,5 +113,36 @@ export class ProductsService {
       return updatedBook;
     }
     return book;
+  }
+
+  async addToCart(
+    userId: string,
+    productId: number,
+    quantity: number,
+  ): Promise<any> {
+    const book = await this.prisma.book.findUnique({
+      where: {
+        id: Number(productId),
+      },
+    });
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: Number(userId),
+      },
+    });
+
+    const item = await this.prisma.cart.create({
+      data: {
+        userId: Number(userId),
+        bookId: Number(userId),
+        quantity,
+      },
+    });
+
+    const cartItem = plainToClass(CartItemDto, item);
+    cartItem.username = user.username;
+    cartItem.bookTitle = book.name;
+    return cartItem;
   }
 }

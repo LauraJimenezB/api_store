@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { Public } from 'src/common/decorators/public.decorator';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { ProductsService } from './products.service';
@@ -50,5 +51,11 @@ export class ProductsController {
   @Post(':id/unlike')
   unlikeBook(@Request() req, @Param('id') bookId: number) {
     return this.productsService.unlikeBook(req.user.id, bookId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/cart')
+  addToCart(@Request() req, @Param('id') bookId: number, @Body() body) {
+    return this.productsService.addToCart(req.user.id, bookId, body.quantity);
   }
 }
