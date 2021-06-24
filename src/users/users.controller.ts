@@ -10,9 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { JwtStrategy } from 'src/auth/jwt.strategy';
-import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { RoleGuard } from './roles/guard/roles.guard';
 import { Roles } from './roles/role.decorator';
 import { UsersService } from './users.service';
