@@ -4,7 +4,6 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IS_PUBLIC_KEY } from 'src/common/decorators/public.decorator';
 import { Reflector } from '@nestjs/core';
-//import { jwtConstants } from './constants';
 
 @Injectable()
 export class JwtStrategy
@@ -25,7 +24,6 @@ export class JwtStrategy
   canActivate(context: ExecutionContext): boolean | Promise<boolean> {
     const isPublic = this.reflector.get(IS_PUBLIC_KEY, context.getHandler());
     if (isPublic) {
-      console.log('is public');
       return true;
     }
   }

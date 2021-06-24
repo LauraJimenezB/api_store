@@ -8,49 +8,72 @@ import {
   Post,
   Query,
   Request,
-  UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+
 import { Public } from 'src/common/decorators/public.decorator';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
 
+@ApiTags('books')
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Public()
   @Get()
-  async getAllProducts(@Query() paginationQueryDto: PaginationQueryDto) {
-    return await this.productsService.getAllProducts(paginationQueryDto);
+  async getBooks(@Query() paginationQueryDto: PaginationQueryDto) {
+    return await this.productsService.getAll(paginationQueryDto);
   }
 
   @Get(':id')
-  getProduct(@Param('id') id: number) {
-    return this.productsService.getProduct(id);
+  getBook(@Param('id') id: number) {
+    return this.productsService.get(id);
+  }
+
+  @Post()
+  create(@Body() productDto: CreateProductDto) {
+    return this.productsService.create(productDto);
   }
 
   @Patch(':id')
-  updateBook(@Param('id') id: number, @Body() body) {
-    return this.productsService.updateProduct(id);
+  updateBook(@Param('id') id: number, @Body() productDto: UpdateProductDto) {
+    return this.productsService.update(id, productDto);
   }
 
   @Delete(':id')
   removeBook(@Param('id') id: number) {
-    return this.productsService.deleteProduct(id);
+    return this.productsService.delete(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Get('category/:name')
+  getByCategory(@Request() req, @Param('name') categoryName: string) {
+    return this.productsService.getByCategory(categoryName);
+  }
+
+  @Post(':id/disable')
+  disableBook(@Request() req, @Param('id') bookId: number) {
+    return this.productsService.disable(bookId);
+  }
+
+  @Post(':id/enable')
+  enableBook(@Request() req, @Param('id') bookId: number) {
+    return this.productsService.enable(bookId);
+  }
+
   @Post(':id/like')
   likeBook(@Request() req, @Param('id') bookId: number) {
-    return this.productsService.likeBook(req.user.id, bookId);
+    return this.productsService.like(req.user.id, bookId);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post(':id/unlike')
   unlikeBook(@Request() req, @Param('id') bookId: number) {
-    return this.productsService.unlikeBook(req.user.id, bookId);
+    return this.productsService.unlike(req.user.id, bookId);
   }
 
   @UseGuards(JwtAuthGuard)

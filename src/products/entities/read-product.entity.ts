@@ -1,5 +1,3 @@
-import { Decimal } from '@prisma/client/runtime';
-
 export class ReadProductEntity {
   name: string;
   authors: string[];
