@@ -9,10 +9,15 @@ import { ProductsModule } from './products/products.module';
 import { CommonModule } from './common/common.module';
 
 @Module({
-    imports: [ConfigModule.forRoot(), CommonModule, UsersModule, AuthModule, ProductsModule],
-    controllers: [AppController],
-    providers: [AppService],
-
+  imports: [
+    ConfigModule.forRoot(),
+    CommonModule,
+    UsersModule,
+    AuthModule,
+    ProductsModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 // eslint-disable-next-line prettier/prettier
 export class AppModule { }

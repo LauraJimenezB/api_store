@@ -6,8 +6,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../common/prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+//import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       useFactory: (configService: ConfigService) => {
         return {
           secret: configService.get<string>('JWT_SECRET'),
-          signOptions: { expiresIn: '60s' },
+          signOptions: { expiresIn: '5min' },
         };
       },
       inject: [ConfigService],
@@ -35,6 +36,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     JwtStrategy,
     CreateUserDto,
     PrismaService,
+    //{ provide: APP_GUARD, useClass: JwtStrategy },
   ],
   exports: [AuthService, JwtModule],
 })
