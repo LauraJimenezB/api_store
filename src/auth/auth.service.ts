@@ -1,11 +1,9 @@
-/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-//import { PrismaService } from '../../prisma/migrations/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { User } from 'src/users/entities/users.entity';
-import { PrismaService } from '../common/prisma.service';
+import { PrismaService } from '../common/prisma/prisma.service';
 import { plainToClass } from 'class-transformer';
 import * as sendgrid from '@sendgrid/mail';
 import * as bcrypt from 'bcrypt';
@@ -31,9 +29,8 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    private createUserDto: CreateUserDto,
     private prisma: PrismaService,
-  ) { }
+  ) {}
 
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.usersService.getUser(username);
@@ -50,7 +47,9 @@ export class AuthService {
     const userRoles = await this.prisma.userRole.findMany({
       where: { userId: user.id },
     });
-    const roles = userRoles.map(userRole=>userRole.roleId===1 ? 'CLIENT' : 'MANAGER')
+    const roles = userRoles.map((userRole) =>
+      userRole.roleId === 1 ? 'CLIENT' : 'MANAGER',
+    );
     const payload = { username: user.username, sub: user.id, roles: roles };
     return {
       access_token: this.jwtService.sign(payload),

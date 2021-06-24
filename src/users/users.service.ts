@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../common/prisma.service';
+import { PrismaService } from '../common/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { plainToClass } from 'class-transformer';
 import { User } from './entities/users.entity';

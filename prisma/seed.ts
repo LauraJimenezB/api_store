@@ -66,14 +66,14 @@ const userRoles = [
 ]
 
 const categories = [
-    { name: 'Comedy' },
-    { name: 'Fiction' },
-    { name: 'Novel' },
-    { name: 'Scientific' },
-    { name: 'Poetry' },
-    { name: 'Historical' },
-    { name: 'Fantasy' },
-    { name: 'Horror' },
+    { name: 'comedy' },
+    { name: 'fiction' },
+    { name: 'novel' },
+    { name: 'scientific' },
+    { name: 'poetry' },
+    { name: 'historical' },
+    { name: 'fantasy' },
+    { name: 'horror' },
 ]
 
 const books = [
@@ -259,7 +259,6 @@ const clearDatabase = async function () {
             }
         }
     } catch (err) {
-        // eslint-disable-next-line no-console
         console.error(err)
     } finally {
         await prisma.$disconnect()

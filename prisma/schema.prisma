@@ -47,6 +47,7 @@ model Book {
   editorial  String
   price      Float
   stock      Int
+  disabled   Boolean      @default(false)
   categoryId Int          @map(name: "category_id")
   favourites Int[]
   bookimages BookImages[]
