@@ -6,7 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { PrismaService } from '../common/prisma/prisma.service';
+import { PrismaService } from '../common/services/prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 //import { APP_GUARD } from '@nestjs/core';
 

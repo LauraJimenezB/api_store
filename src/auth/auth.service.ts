@@ -3,19 +3,12 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { User } from 'src/users/entities/users.entity';
-import { PrismaService } from '../common/prisma/prisma.service';
+import { PrismaService } from '../common/services/prisma.service';
 import { plainToClass } from 'class-transformer';
-import * as sendgrid from '@sendgrid/mail';
 import * as bcrypt from 'bcrypt';
-
-sendgrid.setApiKey(process.env.API_KEY);
-
-const generateEmailToken = (): string => {
-  return Math.floor(10000000 + Math.random() * 90000000).toString();
-};
-
-const saltRounds = 10;
-const salt = bcrypt.genSaltSync(saltRounds);
+import { generateEmailToken } from 'src/common/helpers/activationCodeHelper';
+import { getHash } from 'src/common/helpers/cipherHelper';
+import { sendEmailToken } from 'src/common/services/sendgrid.service';
 
 async function validatePassword(
   plainTextPassword: string,
@@ -56,20 +49,9 @@ export class AuthService {
     };
   }
 
-  async sendEmailToken(email: string, emailToken: string): Promise<void> {
-    const msg = {
-      to: email,
-      from: 'hope.acmu@gmail.com', // Use the email address or domain you verified above
-      subject: 'Confirm email',
-      html: `http://localhost:3000/${emailToken}/confirm`,
-    };
-
-    await sendgrid.send(msg);
-  }
-
   async signup(user: CreateUserDto): Promise<string> {
     const emailToken = generateEmailToken();
-    const hash = bcrypt.hashSync(user.password, salt);
+    const hash = getHash(user.password);
     const createdUser = await this.prisma.user.create({
       data: {
         username: user.username,
@@ -79,7 +61,7 @@ export class AuthService {
         hashActivation: emailToken,
       },
     });
-    await this.sendEmailToken(createdUser.email, createdUser.hashActivation);
+    sendEmailToken(createdUser.email, createdUser.hashActivation);
     return 'Verify your email';
   }
 
