@@ -17,11 +17,14 @@ export class ProductsService {
     const { limit, offset } = paginationQueryDto;
 
     const categories = await this.prisma.category.findMany();
-    const products = await this.prisma.book.findMany({
+    const books = await this.prisma.book.findMany({
       skip: offset,
       take: limit,
+      where: {
+        disabled: false,
+      },
     });
-    const prods = products.map((prod) => {
+    const prods = books.map((prod) => {
       return {
         ...prod,
         favourites: prod.favourites.length,
@@ -34,13 +37,13 @@ export class ProductsService {
 
   async get(id: number): Promise<ReadProductEntity> {
     const categories = await this.prisma.category.findMany();
-    const product = await this.prisma.book.findUnique({
+    const book = await this.prisma.book.findUnique({
       where: { id: id },
     });
-    const prod = plainToClass(ReadProductEntity, product);
-    prod.favourites = product.favourites.length;
+    const prod = plainToClass(ReadProductEntity, book);
+    prod.favourites = book.favourites.length;
     prod.categoryName = categories.filter(
-      (c) => c.id === product.categoryId,
+      (c) => c.id === book.categoryId,
     )[0].name;
     return prod;
   }
@@ -66,7 +69,14 @@ export class ProductsService {
     id: number,
     updateDto: UpdateProductDto,
   ): Promise<ReadProductEntity> {
+    const book = await this.prisma.book.findUnique({
+      where: { id: id },
+    });
+    if (!book) {
+      throw new NotFoundException();
+    }
     const category = await this.preloadCategoryByName(updateDto.category);
+
     await this.prisma.book.update({
       where: {
         id: id,
@@ -84,12 +94,18 @@ export class ProductsService {
   }
 
   async delete(id: number): Promise<ReadProductEntity> {
-    const product = await this.prisma.book.delete({
+    const book = await this.prisma.book.findUnique({
+      where: { id: id },
+    });
+    if (!book) {
+      throw new NotFoundException();
+    }
+    await this.prisma.book.delete({
       where: {
         id: id,
       },
     });
-    return plainToClass(ReadProductEntity, product);
+    return plainToClass(ReadProductEntity, book);
   }
 
   async getByCategory(name: string): Promise<any> {
@@ -97,10 +113,10 @@ export class ProductsService {
       where: { name: name.toLowerCase() },
     });
     console.log(category);
-    const products = await this.prisma.book.findMany({
+    const books = await this.prisma.book.findMany({
       where: { categoryId: category.id },
     });
-    const prods = products.map((prod) => {
+    const prods = books.map((prod) => {
       return {
         ...prod,
         favourites: prod.favourites.length,
