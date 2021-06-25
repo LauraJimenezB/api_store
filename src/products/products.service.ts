@@ -226,7 +226,6 @@ export class ProductsService {
       data: {
         userId: userId,
         bookId: productId,
-        bookTitle: book.name,
         quantity,
         price: priceOfItems,
       },
