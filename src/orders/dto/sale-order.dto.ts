@@ -1,5 +1,4 @@
-import { CartItem } from '@prisma/client';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import { OrderDto } from './order.dto';
 
 export class SaleOrderDto {

@@ -5,6 +5,7 @@ import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
 import { CartItemDto } from './dto/cart-item.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { ShowCartItemDto } from './dto/showcart-item.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ReadProductEntity } from './entities/read-product.entity';
 
@@ -223,7 +224,7 @@ export class ProductsService {
     userId: number,
     productId: number,
     quantity: number,
-  ): Promise<any> {
+  ): Promise<ShowCartItemDto> {
     const book = await this.prisma.book.findUnique({
       where: {
         id: productId,
@@ -235,21 +236,21 @@ export class ProductsService {
         id: userId,
       },
     });
-
-    const priceOfItems = quantity * book.price;
-
-    const item = await this.prisma.cartItem.create({
+    await this.prisma.cart.create({
       data: {
         userId: userId,
         bookId: productId,
-        bookTitle: book.name,
-        quantity,
-        price: priceOfItems,
+        quantity: quantity,
       },
     });
 
-    const cartItem = plainToClass(CartItemDto, item);
-    cartItem.username = user.username;
+    const cartItem = plainToClass(ShowCartItemDto, {
+      username: user.username,
+      title: book.name,
+      quantity: quantity,
+      price: book.price,
+      pricetotal: quantity * book.price,
+    });
     return cartItem;
   }
 }
