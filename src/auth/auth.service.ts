@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { User } from 'src/users/entities/users.entity';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { User } from '../users/entities/users.entity';
 import { PrismaService } from '../common/services/prisma.service';
 import { plainToClass } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
-import { generateEmailToken } from 'src/common/helpers/activationCodeHelper';
-import { getHash } from 'src/common/helpers/cipherHelper';
-import { sendEmailToken } from 'src/common/services/sendgrid.service';
+import { generateEmailToken } from '../common/helpers/activationCodeHelper';
+import { getHash } from '../common/helpers/cipherHelper';
+import { sendEmailToken } from '../common/services/sendgrid.service';
 
 async function validatePassword(
   plainTextPassword: string,

@@ -2,7 +2,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IS_PUBLIC_KEY } from 'src/common/decorators/public.decorator';
+import { IS_PUBLIC_KEY } from '../common/decorators/public.decorator';
 import { Reflector } from '@nestjs/core';
 
 @Injectable()

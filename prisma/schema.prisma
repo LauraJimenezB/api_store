@@ -22,7 +22,7 @@ model User {
   createdAt      DateTime   @default(now()) @map(name: "created_at")
   confirmedAt    DateTime?  @map(name: "confirmed_at")
   roles          UserRole[]
-  carts          Cart[]
+  carts          CartItem[]
   sales          Sale[]
 }
 
@@ -51,9 +51,8 @@ model Book {
   categoryId Int          @map(name: "category_id")
   favourites Int[]
   bookimages BookImages[]
-  cart       Cart[]
+  cart       CartItem[]
   sale       Sale[]
-  bookSale   BookSale[]
   category   Category     @relation(fields: [categoryId], references: [id])
 }
 
@@ -70,13 +69,16 @@ model Category {
   book Book[]
 }
 
-model Cart {
+model CartItem {
   id       Int  @id @default(autoincrement())
   userId   Int  @map(name: "user_id")
   bookId   Int  @map(name: "book_id")
   quantity Int
+  price Float?
   user     User @relation(fields: [userId], references: [id])
   book     Book @relation(fields: [bookId], references: [id])
+  sale      Sale?  @relation(fields: [saleId], references: [id])
+  saleId  Int?  
 }
 
 model Sale {
@@ -85,17 +87,9 @@ model Sale {
   saleStatus String
   userId     Int        @map(name: "user_id")
   user       User       @relation(fields: [userId], references: [id])
-  booksales  BookSale[]
+  cartItems  CartItem[]
   Book       Book?      @relation(fields: [bookId], references: [id])
   bookId     Int?
+  totalPrice Float?
 }
 
-model BookSale {
-  id         Int   @id @default(autoincrement())
-  saleId     Int   @map(name: "sale_id")
-  bookId     Int   @map(name: "book_id")
-  quantity   Int
-  priceTotal Float @map(name: "price_total")
-  sale       Sale  @relation(fields: [saleId], references: [id])
-  book       Book  @relation(fields: [bookId], references: [id])
-}
