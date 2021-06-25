@@ -27,6 +27,7 @@
     "prisma:generate": "npx prisma generate",
     "prisma:generate:watch": "npx prisma generate --watch",
     "prisma:studio": "npx prisma studio",
+    "seed": "ts-node ./prisma/seed.ts",
     "migrate:dbtest": "npx dotenv -e .env.test -- npx prisma migrate dev --name experimental"
   },
   "dependencies": {
