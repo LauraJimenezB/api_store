@@ -5,6 +5,7 @@ import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
 import { CartItemDto } from './dto/cart-item.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { ShowCartItemDto } from './dto/showcart-item.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ReadProductEntity } from './entities/read-product.entity';
 
@@ -18,11 +19,14 @@ export class ProductsService {
     const { limit, offset } = paginationQueryDto;
 
     const categories = await this.prisma.category.findMany();
-    const products = await this.prisma.book.findMany({
+    const books = await this.prisma.book.findMany({
       skip: offset,
       take: limit,
+      where: {
+        disabled: false,
+      },
     });
-    const prods = products.map((prod) => {
+    const prods = books.map((prod) => {
       return {
         ...prod,
         favourites: prod.favourites.length,
@@ -35,13 +39,13 @@ export class ProductsService {
 
   async get(id: number): Promise<ReadProductEntity> {
     const categories = await this.prisma.category.findMany();
-    const product = await this.prisma.book.findUnique({
+    const book = await this.prisma.book.findUnique({
       where: { id: id },
     });
-    const prod = plainToClass(ReadProductEntity, product);
-    prod.favourites = product.favourites.length;
+    const prod = plainToClass(ReadProductEntity, book);
+    prod.favourites = book.favourites.length;
     prod.categoryName = categories.filter(
-      (c) => c.id === product.categoryId,
+      (c) => c.id === book.categoryId,
     )[0].name;
     return prod;
   }
@@ -67,7 +71,14 @@ export class ProductsService {
     id: number,
     updateDto: UpdateProductDto,
   ): Promise<ReadProductEntity> {
+    const book = await this.prisma.book.findUnique({
+      where: { id: id },
+    });
+    if (!book) {
+      throw new NotFoundException();
+    }
     const category = await this.preloadCategoryByName(updateDto.category);
+
     await this.prisma.book.update({
       where: {
         id: id,
@@ -85,12 +96,18 @@ export class ProductsService {
   }
 
   async delete(id: number): Promise<ReadProductEntity> {
-    const product = await this.prisma.book.delete({
+    const book = await this.prisma.book.findUnique({
+      where: { id: id },
+    });
+    if (!book) {
+      throw new NotFoundException();
+    }
+    await this.prisma.book.delete({
       where: {
         id: id,
       },
     });
-    return plainToClass(ReadProductEntity, product);
+    return plainToClass(ReadProductEntity, book);
   }
 
   async getByCategory(name: string): Promise<any> {
@@ -98,10 +115,10 @@ export class ProductsService {
       where: { name: name.toLowerCase() },
     });
     console.log(category);
-    const products = await this.prisma.book.findMany({
+    const books = await this.prisma.book.findMany({
       where: { categoryId: category.id },
     });
-    const prods = products.map((prod) => {
+    const prods = books.map((prod) => {
       return {
         ...prod,
         favourites: prod.favourites.length,
@@ -207,7 +224,7 @@ export class ProductsService {
     userId: number,
     productId: number,
     quantity: number,
-  ): Promise<any> {
+  ): Promise<ShowCartItemDto> {
     const book = await this.prisma.book.findUnique({
       where: {
         id: productId,
@@ -219,21 +236,21 @@ export class ProductsService {
         id: userId,
       },
     });
-
-    const priceOfItems = quantity * book.price;
-
-    const item = await this.prisma.cartItem.create({
+    await this.prisma.cart.create({
       data: {
         userId: userId,
         bookId: productId,
-        bookTitle: book.name,
-        quantity,
-        price: priceOfItems,
+        quantity: quantity,
       },
     });
 
-    const cartItem = plainToClass(CartItemDto, item);
-    cartItem.username = user.username;
+    const cartItem = plainToClass(ShowCartItemDto, {
+      username: user.username,
+      title: book.name,
+      quantity: quantity,
+      price: book.price,
+      pricetotal: quantity * book.price,
+    });
     return cartItem;
   }
 }

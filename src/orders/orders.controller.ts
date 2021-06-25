@@ -9,9 +9,6 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { LocalAuthGuard } from 'src/auth/local-auth.guard';
-
-import { Public } from 'src/common/decorators/public.decorator';
 import { OrdersService } from './orders.service';
 
 @ApiTags('orders')
