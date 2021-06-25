@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -17,9 +18,22 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @UseGuards(JwtAuthGuard)
+  @Get('mycart')
+  showCart(@Request() req) {
+    return this.ordersService.showCart(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get()
   showOrder(@Request() req) {
     return this.ordersService.showOrder(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  //for manager
+  showOrderOfUser(@Request() req, @Param('id') userId: number) {
+    return this.ordersService.showOrder(userId);
   }
 
   @UseGuards(JwtAuthGuard)
