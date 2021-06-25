@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { classToPlain, plainToClass } from 'class-transformer';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
+import { plainToClass } from 'class-transformer';
 import { PrismaService } from '../common/services/prisma.service';
-import { OrderDto } from './dto/order.dto';
-import { SaleOrderDto } from './dto/sale-order.dto';
 import { ShowAllOrdersDto } from './dto/showAllorders.dto';
 import { ShowOrderDto } from './dto/showorder.dto';
 
@@ -10,7 +12,7 @@ import { ShowOrderDto } from './dto/showorder.dto';
 export class OrdersService {
   constructor(private prisma: PrismaService) {}
 
-  async showOrder(userId: number): Promise<ShowAllOrdersDto> {
+  async showCart(userId: number): Promise<ShowAllOrdersDto> {
     const getItems = await this.prisma.cart.findMany({
       where: {
         userId,
@@ -35,7 +37,43 @@ export class OrdersService {
     });
   }
 
-  async sendOrder(userId: number): Promise<any> {
+  async showOrder(userId: number): Promise<ShowAllOrdersDto> {
+    const sale = await this.prisma.sale.findFirst({
+      where: {
+        userId,
+      },
+    });
+    if (!sale) {
+      throw new NotFoundException();
+    }
+    const bookSales = await this.prisma.bookSale.findMany({
+      where: {
+        saleId: sale.id,
+      },
+      include: {
+        book: true,
+      },
+    });
+
+    const items = bookSales.map((item) => {
+      return plainToClass(ShowOrderDto, {
+        bookTitle: item.book.name,
+        quantity: item.quantity,
+        price: item.book.price,
+        priceTotal: item.book.price * item.quantity,
+      });
+    });
+    const total = items.reduce(
+      (acc: number, next: ShowOrderDto) => (acc += next.priceTotal),
+      0,
+    );
+    return plainToClass(ShowAllOrdersDto, {
+      totalamount: total,
+      orders: items,
+    });
+  }
+
+  async sendOrder(userId: number): Promise<ShowAllOrdersDto> {
     const getItems = await this.prisma.cart.findMany({
       where: {
         userId,
@@ -44,6 +82,14 @@ export class OrdersService {
         book: true,
       },
     });
+    getItems.forEach((item) => {
+      if (item.book.stock < item.quantity) {
+        throw new NotAcceptableException(
+          'The quantity is greater that the stock available',
+        );
+      }
+    });
+
     const createdOrder = await this.prisma.sale.create({
       data: {
         saleStatus: 'Done',
@@ -58,6 +104,14 @@ export class OrdersService {
           bookId: item.bookId,
           quantity: item.quantity,
           priceTotal: item.quantity * item.book.price,
+        },
+      });
+      await this.prisma.book.update({
+        where: {
+          id: item.bookId,
+        },
+        data: {
+          stock: item.book.stock - item.quantity,
         },
       });
     });

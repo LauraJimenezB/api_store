@@ -1,9 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Category } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
-import { CartItemDto } from './dto/cart-item.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ShowCartItemDto } from './dto/showcart-item.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -230,16 +233,41 @@ export class ProductsService {
         id: productId,
       },
     });
-
+    if (!book) {
+      throw new NotFoundException();
+    }
+    if (book.stock < quantity) {
+      throw new NotAcceptableException(
+        'The quantity is greater that the stock available',
+      );
+    }
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
       },
     });
-    await this.prisma.cart.create({
-      data: {
+
+    const getAlreadyInCart = await this.prisma.cart.findFirst({
+      where: {
         userId: userId,
         bookId: productId,
+      },
+    });
+    if (!getAlreadyInCart) {
+      await this.prisma.cart.create({
+        data: {
+          userId: userId,
+          bookId: productId,
+          quantity: quantity,
+        },
+      });
+    }
+
+    await this.prisma.cart.update({
+      where: {
+        id: getAlreadyInCart.id,
+      },
+      data: {
         quantity: quantity,
       },
     });
