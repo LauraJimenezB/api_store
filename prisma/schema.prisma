@@ -51,6 +51,7 @@ model Book {
   favourites Int[]
   categoryId Int          @map(name: "category_id")
   bookimages BookImages[]
+  images Attachment[]
   cart       Cart[]
   bookSale   BookSale[]
   category   Category     @relation(fields: [categoryId], references: [id])
@@ -59,7 +60,7 @@ model Book {
 model BookImages {
   id     Int    @id @default(autoincrement())
   bookId Int    @map(name: "book_id")
-  path   String
+  key String
   book   Book   @relation(fields: [bookId], references: [id])
 }
 
@@ -95,4 +96,12 @@ model BookSale {
   priceTotal Float @map(name: "price_total")
   sale       Sale  @relation(fields: [saleId], references: [id])
   book       Book  @relation(fields: [bookId], references: [id])
+}
+
+model Attachment {
+  id          Int      @id @default(autoincrement())
+  key         String
+  bookId Int
+  book    Book[]  @relation(fields: [bookId], references: [id])
+  createdAt   DateTime @default(now()) @map(name: "created_at")
 }
