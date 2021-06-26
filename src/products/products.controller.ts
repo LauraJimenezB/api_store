@@ -7,10 +7,15 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateAttachmentInput } from 'src/attachments/dto/create-attachment-input.dto';
 
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
@@ -20,6 +25,10 @@ import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
+
+class SampleDto {
+  name: string;
+}
 
 @ApiTags('books')
 @Controller('products')
@@ -83,5 +92,26 @@ export class ProductsController {
   @Post(':id/cart')
   addToCart(@Request() req, @Param('id') bookId: number, @Body() body) {
     return this.productsService.addToCart(req.user.id, bookId, body.quantity);
+  }
+
+  @Post(':id/image')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async addPrivateFile(
+    @Param('id') bookId: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    console.log(file);
+    return this.productsService.addPrivateFile(
+      bookId,
+      file.buffer,
+      file.originalname,
+    );
+  }
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file.originalname);
   }
 }

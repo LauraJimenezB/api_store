@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { RoleGuard } from './roles/guard/roles.guard';
 import { Roles } from './roles/role.decorator';
 import { UsersService } from './users.service';
@@ -25,14 +26,14 @@ export class UsersController {
     return await this.usersService.getAllUsers();
   }
 
-  /* @Get(':id')
-  getUser(@Param('id') username: string) {
-    return this.usersService.getUser(username);
-  } */
+  @Get(':id')
+  getUser(@Param('id') id: number) {
+    return this.usersService.getUser(id);
+  }
 
   @Patch(':id')
-  updateUser(@Param('id') id: string, @Body() body) {
-    return this.usersService.updateUser(Number(id));
+  updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
+    return this.usersService.updateUser(Number(id), body);
   }
 
   @Delete(':id')

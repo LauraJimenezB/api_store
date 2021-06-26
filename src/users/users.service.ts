@@ -22,24 +22,50 @@ export class UsersService {
     return users;
   }
 
-  async getUser(username: string): Promise<User> {
+  async getUser(userId: number): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if(!user) {
+      throw new NotFoundException();
+    }
+    return user;
+  }
+
+  async getUserToValidate(username: string): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: { username: username },
     });
     return user;
   }
 
-  async updateUser(id: number): Promise<User> {
+  async updateUser(id: number, userContent): Promise<User> {
     const user = this.prisma.user.findUnique({ where: { id } });
-    return user;
+
+    if(!user) {
+      throw new NotFoundException();
+    }
+
+    const updatedUser = this.prisma.user.update({ where: { id }, data:{
+      username: userContent.username,
+      fullName: userContent.fullName,
+      email: userContent.email,
+      password: userContent.password,
+    } });
+    return updatedUser;
   }
 
   async deleteUser(id: number): Promise<User> {
-    const user = this.prisma.user.findUnique({ where: { id } });
+    const user = this.prisma.user.delete({ where: { id } });
+
+    if(!user) {
+      throw new NotFoundException();
+    }
+
     return user;
   }
 
-  async setRoleToUser(userId: number, roleId: number) : Promise<User> {
+  async setRoleToUser(userId: number, roleId: number) : Promise<UserDto> {
     const userExists = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -72,6 +98,13 @@ export class UsersService {
     const updatedUser = await this.prisma.user.findUnique({
       where: { id: userId },
     });
-    return plainToClass(UserDto, updatedUser);
+
+    const userWithRole = plainToClass(UserDto, updatedUser);
+    const getRole = await this.prisma.userRole.findMany({
+      where: { userId: userId },
+    });
+    const roles = getRole.map((role)=>role.roleId===1 ? 'Client' : "Manager");
+    userWithRole.roles = roles;
+    return userWithRole;
   }
 }

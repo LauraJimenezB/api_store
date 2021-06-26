@@ -5,16 +5,26 @@ import {
 } from '@nestjs/common';
 import { Category } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
+import { AttachmentsService } from '../attachments/services/attachments.service';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ShowCartItemDto } from './dto/showcart-item.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ReadProductEntity } from './entities/read-product.entity';
+import { AttachmentDto } from 'src/attachments/dto/attachment.dto';
+import {
+  AttachmentDirectoryEnum,
+  ParentEnum,
+} from 'src/attachments/enums/attachment.enum';
+import { CreateAttachmentInput } from 'src/attachments/dto/create-attachment-input.dto';
 
 @Injectable()
 export class ProductsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private attachmentsService: AttachmentsService,
+  ) {}
 
   async getAll(
     paginationQueryDto: PaginationQueryDto,
@@ -280,5 +290,9 @@ export class ProductsService {
       pricetotal: quantity * book.price,
     });
     return cartItem;
+  }
+
+  async addPrivateFile(bookId: number, imageBuffer: Buffer, filename: string) {
+    return this.attachmentsService.uploadImages(imageBuffer, bookId, filename);
   }
 }
