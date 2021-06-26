@@ -62,7 +62,8 @@ export class ProductsController {
   }
 
   @Get('category/:name')
-  getByCategory(@Request() req, @Param('name') categoryName: string) {
+  getByCategory(@Param('name') categoryName: string) {
+    console.log('cateeeee');
     return this.productsService.getByCategory(categoryName);
   }
 
