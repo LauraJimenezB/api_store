@@ -5,5 +5,6 @@ export class ReadProductEntity {
   price: number;
   stock: number;
   categoryName: string;
+  disabled: boolean;
   favourites: number;
 }
