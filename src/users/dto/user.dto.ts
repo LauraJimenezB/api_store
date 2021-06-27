@@ -4,7 +4,7 @@ export class UserDto {
   username: string;
   email: string;
   fullname: string;
-  role: string;
+  roles: string[];
   @Exclude()
   fullName: string;
   @Exclude()
