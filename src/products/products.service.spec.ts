@@ -1,9 +1,11 @@
-import { NotFoundException } from '@nestjs/common';
+import { NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
+import { CartQuantityDto } from './dto/cart-quantity.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { ShowCartItemDto } from './dto/showcart-item.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
 
@@ -26,6 +28,27 @@ describe('ProductsService', () => {
 
   beforeAll(async () => {
     const prisma = new PrismaClient();
+    //create user
+    await prisma.user.createMany({
+      data: [
+        {
+          email: 'ana@store.com',
+          username: 'azevallos',
+          fullName: 'Ana Zeballos',
+          password: 'contrasena123',
+          emailVerified: true,
+          hashActivation: 'caracteresaleatorios1',
+        },
+      ],
+    });
+    //create roles
+    await prisma.role.createMany({
+      data: [{ name: 'CLIENT' }, { name: 'MANAGER' }],
+    });
+    // create userRole
+    await prisma.userRole.createMany({
+      data: [{ userId: 1, roleId: 1 }],
+    });
     //create categories
     await prisma.category.createMany({
       data: [{ name: 'novel' }, { name: 'fantasy' }],
@@ -137,7 +160,60 @@ describe('ProductsService', () => {
     it('should return the books', async () => {
       const category = 'Fantasy';
       const allBooks = await service.getByCategory(category);
-      expect(allBooks).toHaveLength(2);
+      expect(allBooks).toHaveLength(1);
+    });
+    it('should return a notfound exception if the category does not exist', async () => {
+      await expect(service.getByCategory('')).rejects.toThrowError(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('show disable a book', () => {
+    it('should return a notfound exception if id does not exist', async () => {
+      await expect(service.disable(-1)).rejects.toThrowError(NotFoundException);
+    });
+    it('should disable a book', async () => {
+      const book = await service.disable(2);
+      expect(book).toHaveProperty('disabled', true);
+    });
+  });
+
+  describe('show enable a book', () => {
+    it('should return a notfound exception if id does not exist', async () => {
+      await expect(service.enable(-1)).rejects.toThrowError(NotFoundException);
+    });
+    it('should enable a book', async () => {
+      const book = await service.enable(2);
+      expect(book).toHaveProperty('disabled', false);
+    });
+  });
+
+  describe('show add book to cart', () => {
+    it('should return a not acceptable exception if quantity less that 1', async () => {
+      const quantityDto: CartQuantityDto = { quantity: 0 };
+      await expect(service.addToCart(1, 2, quantityDto)).rejects.toThrowError(
+        NotAcceptableException,
+      );
+    });
+
+    it('should return a notfound exception if id does not exist', async () => {
+      const quantityDto: CartQuantityDto = { quantity: 1 };
+      await expect(service.addToCart(1, -1, quantityDto)).rejects.toThrowError(
+        NotFoundException,
+      );
+    });
+
+    it('should return a not acceptable exception if quantity is greater that stock', async () => {
+      const quantityDto: CartQuantityDto = { quantity: 99999 };
+      await expect(service.addToCart(1, 2, quantityDto)).rejects.toThrowError(
+        NotAcceptableException,
+      );
+    });
+    it('should return the cart with the stock', async () => {
+      const quantityDto: CartQuantityDto = { quantity: 2 };
+      const cartItem = await service.addToCart(1, 2, quantityDto);
+      expect(cartItem).toBeInstanceOf(ShowCartItemDto);
     });
   });
 

@@ -17,6 +17,7 @@ import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 
 import { Public } from 'src/common/decorators/public.decorator';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { CartQuantityDto } from './dto/cart-quantity.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
@@ -59,12 +60,12 @@ export class ProductsController {
   }
 
   @Post(':id/disable')
-  disableBook(@Request() req, @Param('id') bookId: number) {
+  disableBook(@Param('id') bookId: number) {
     return this.productsService.disable(bookId);
   }
 
   @Post(':id/enable')
-  enableBook(@Request() req, @Param('id') bookId: number) {
+  enableBook(@Param('id') bookId: number) {
     return this.productsService.enable(bookId);
   }
 
@@ -82,7 +83,11 @@ export class ProductsController {
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/cart')
-  addToCart(@Request() req, @Param('id') bookId: number, @Body() body) {
-    return this.productsService.addToCart(req.user.id, bookId, body.quantity);
+  addToCart(
+    @Request() req,
+    @Param('id') bookId: number,
+    @Body() body: CartQuantityDto,
+  ) {
+    return this.productsService.addToCart(req.user.id, bookId, body);
   }
 }
