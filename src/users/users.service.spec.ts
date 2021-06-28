@@ -1,10 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { plainToClass } from 'class-transformer';
 import { PrismaService } from '../common/services/prisma.service';
-import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 
 describe('UsersService', () => {
@@ -24,6 +21,7 @@ describe('UsersService', () => {
     await prismaService.user.createMany({
       data: [
         {
+          id: 1,
           username: 'anaC',
           fullName: 'Ana Castillo',
           email: 'example123@mail.com',
@@ -31,6 +29,7 @@ describe('UsersService', () => {
           hashActivation: '123456',
         },
         {
+          id: 2,
           username: 'MartG',
           fullName: 'Martin Gonzales',
           email: 'martin456@mail.com',
@@ -57,55 +56,51 @@ describe('UsersService', () => {
 
   describe('get single user', () => {
     it('should return a user', async () => {
-      const user = await userService.getUser(1);
+      const user = await userService.get(1);
       expect(user.fullName).toBe('Ana Castillo');
       expect(user.email).toBe('example123@mail.com');
     });
     it('should throw an error when user does not exists in the database', async () => {
-      await expect(userService.getUser(6)).rejects.toThrow('Not Found');
+      await expect(userService.get(6)).rejects.toThrow('Not Found');
     });
   });
 
   describe('update user', () => {
     it('should return the updated user', async () => {
-      const user = await userService.updateUser(1, { username: 'Ana1246' });
+      const user = await userService.update(1, { username: 'Ana1246' });
       expect(user.username).toBe('Ana1246');
     });
     it('should throw an error when user does not exists in the database', async () => {
       await expect(
-        userService.updateUser(6, { email: 'ex@mail.com' }),
+        userService.update(6, { email: 'ex@mail.com' }),
       ).rejects.toThrow(
         'An operation failed because it depends on one or more records that were required but not found. Record to update not found.',
       );
     });
-    /* it('should throw an error when email is not an email', async () => {
-      await expect(
-        userService.updateUser(2, { email: 'examplegmail.com' }),
-      ).rejects.toThrow('email must be an email');
-    }); */
   });
 
   describe('set role to user', () => {
-    it('should return a user', async () => {
-      const user = await userService.setRoleToUser(1, 1);
+    /* it('should return a user', async () => {
+      const user = await userService.setAdminRole(1);
+      console.log(user);
       expect(user.username).toBe('Ana1246');
-      expect(user.roles).toContain('Client');
-    });
+      expect(user.roles).toContain('Manager');
+    }); */
     it('should throw an error when user does not exists in the database', async () => {
-      await expect(userService.setRoleToUser(6, 1)).rejects.toThrow(
-        NotFoundException,
+      await expect(userService.setAdminRole(6)).rejects.toThrow(
+        'User not found',
       );
     });
   });
 
   describe('delete user', () => {
     it('should return the deleted user', async () => {
-      const user = await userService.deleteUser(2);
+      const user = await userService.delete(2);
       expect(user.fullName).toBe('Martin Gonzales');
       expect(user.email).toBe('martin456@mail.com');
     });
     it('should throw an error when user does not exists in the database', async () => {
-      await expect(userService.deleteUser(6)).rejects.toThrowError(
+      await expect(userService.delete(6)).rejects.toThrowError(
         PrismaClientKnownRequestError,
       );
     });

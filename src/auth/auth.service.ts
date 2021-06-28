@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -12,6 +12,7 @@ import { sendEmailToken } from '../common/services/sendgrid.service';
 import { ConfirmedUserDto } from './dto/confirmed-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { LogInUserDto } from './dto/login-user.dto';
+import { UserDto } from 'src/users/dto/user.dto';
 
 async function validatePassword(
   plainTextPassword: string,
@@ -28,13 +29,17 @@ export class AuthService {
     private prisma: PrismaService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<User> {
-    const user = await this.usersService.getUserToValidate(username);
+  async validateUser(username: string, password: string): Promise<any> {
+    const user = await this.usersService.getByUsername(username);
     const validPassword = validatePassword(password, user.password);
     if (user && validPassword) {
       return user;
     }
     return null;
+  }
+
+  async validateAccount(id: number): Promise<UserDto> {
+    return await this.usersService.get(id);
   }
 
   async login(user: LogInUserDto) {
@@ -51,6 +56,18 @@ export class AuthService {
   }
 
   async signup(user: CreateUserDto): Promise<VerifyEmailDto> {
+    let userFound = await this.prisma.user.findUnique({
+      where: { username: user.username },
+    });
+    if (userFound) {
+      throw new NotAcceptableException('User is already registered');
+    }
+    userFound = await this.prisma.user.findUnique({
+      where: { email: user.email },
+    });
+    if (userFound) {
+      throw new NotAcceptableException('User is already registered');
+    }
     const emailToken = generateEmailToken();
     const hash = getHash(user.password);
     const createdUser = await this.prisma.user.create({

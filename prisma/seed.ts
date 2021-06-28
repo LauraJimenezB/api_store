@@ -248,7 +248,7 @@ const books = [
 ]
 
 const clearDatabase = async function () {
-    const tableNames = ['User', 'Role', 'UserRole', 'Category', 'Book']
+    const tableNames = ['User', 'Role', 'UserRole', 'Category', 'Book', 'Cart']
     try {
         for (const tableName of tableNames) {
             await prisma.$queryRaw(`DELETE FROM "${tableName}";`)
