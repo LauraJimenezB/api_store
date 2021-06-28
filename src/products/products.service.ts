@@ -8,6 +8,7 @@ import { plainToClass } from 'class-transformer';
 import { AttachmentsService } from '../attachments/services/attachments.service';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
+import { CartQuantityDto } from './dto/cart-quantity.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ShowCartItemDto } from './dto/showcart-item.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -32,6 +33,9 @@ export class ProductsService {
       where: {
         disabled: false,
       },
+      include: {
+        category: true,
+      },
     });
     const prods = books.map((prod) => {
       return {
@@ -47,24 +51,24 @@ export class ProductsService {
   async get(id: number): Promise<ReadProductEntity> {
     const book = await this.prisma.book.findUnique({
       where: { id: id },
+      include: {
+        category: true,
+      },
     });
     if (!book) {
       throw new NotFoundException();
     }
-    const categories = await this.prisma.category.findMany();
-    const prod = plainToClass(ReadProductEntity, book);
-    prod.favourites = book.favourites.length;
-    prod.categoryName = categories.filter(
-      (c) => c.id === book.categoryId,
-    )[0].name;
-    return prod;
+    const product = plainToClass(ReadProductEntity, book);
+    product.favourites = book.favourites.length;
+    product.categoryName = book.category.name;
+    return product;
   }
 
   async create(createDto: CreateProductDto): Promise<ReadProductEntity> {
     const category = await this.preloadCategoryByName(
       createDto.category.toLowerCase(),
     );
-    await this.prisma.book.create({
+    const book = await this.prisma.book.create({
       data: {
         name: createDto.name,
         authors: createDto.authors,
@@ -73,8 +77,14 @@ export class ProductsService {
         stock: createDto.stock,
         categoryId: category.id,
       },
+      include: {
+        category: true,
+      },
     });
-    return plainToClass(ReadProductEntity, createDto);
+    const product = plainToClass(ReadProductEntity, book);
+    product.favourites = book.favourites.length;
+    product.categoryName = book.category.name;
+    return product;
   }
 
   async update(
@@ -104,18 +114,14 @@ export class ProductsService {
         stock: updateDto.stock,
         categoryId: category ? category.id : book.categoryId,
       },
+      include: {
+        category: true,
+      },
     });
-    const prod: ReadProductEntity = {
-      name: updatedBook.name,
-      authors: updatedBook.authors,
-      editorial: updatedBook.editorial,
-      price: updatedBook.price,
-      stock: updatedBook.stock,
-      disabled: updatedBook.disabled,
-      categoryName: category ? category.name : book.category.name,
-      favourites: updatedBook.favourites.length,
-    };
-    return prod;
+    const product = plainToClass(ReadProductEntity, updatedBook);
+    product.favourites = updatedBook.favourites.length;
+    product.categoryName = updatedBook.category.name;
+    return product;
   }
 
   async delete(id: number): Promise<ReadProductEntity> {
@@ -138,11 +144,15 @@ export class ProductsService {
       where: { name: name.toLowerCase() },
     });
 
+    if (!category) {
+      throw new NotFoundException();
+    }
+
     const books = await this.prisma.book.findMany({
       where: { categoryId: category.id },
     });
     const prods = books.map((prod) => {
-      const prodToReturn: ReadProductEntity = {
+      const prodToReturn = {
         ...prod,
         favourites: prod.favourites.length,
         categoryName: category.name,
@@ -153,27 +163,47 @@ export class ProductsService {
   }
 
   async disable(id: number): Promise<ReadProductEntity> {
-    const prod = await this.prisma.book.update({
+    const book = await this.prisma.book.findUnique({
+      where: { id: id },
+    });
+    if (!book) {
+      throw new NotFoundException();
+    }
+    const updatedBook = await this.prisma.book.update({
       where: {
         id: id,
       },
       data: {
         disabled: true,
       },
+      include: { category: true },
     });
-    return plainToClass(ReadProductEntity, prod);
+    const product = plainToClass(ReadProductEntity, updatedBook);
+    product.favourites = updatedBook.favourites.length;
+    product.categoryName = updatedBook.category.name;
+    return product;
   }
 
   async enable(id: number): Promise<ReadProductEntity> {
-    const prod = await this.prisma.book.update({
+    const book = await this.prisma.book.findUnique({
+      where: { id: id },
+    });
+    if (!book) {
+      throw new NotFoundException();
+    }
+    const updatedBook = await this.prisma.book.update({
       where: {
         id: id,
       },
       data: {
         disabled: false,
       },
+      include: { category: true },
     });
-    return plainToClass(ReadProductEntity, prod);
+    const product = plainToClass(ReadProductEntity, updatedBook);
+    product.favourites = updatedBook.favourites.length;
+    product.categoryName = updatedBook.category.name;
+    return product;
   }
 
   private async preloadCategoryByName(name: string): Promise<Category> {
@@ -191,6 +221,9 @@ export class ProductsService {
       where: {
         id: productId,
       },
+      include: {
+        category: true,
+      },
     });
 
     if (!book) {
@@ -200,7 +233,10 @@ export class ProductsService {
     const alreadyLiked = book.favourites.includes(Number(userId));
 
     if (alreadyLiked) {
-      return book;
+      const product = plainToClass(ReadProductEntity, book);
+      product.favourites = book.favourites.length;
+      product.categoryName = book.category.name;
+      return product;
     }
     const updatedBook = await this.prisma.book.update({
       where: {
@@ -211,14 +247,23 @@ export class ProductsService {
           push: userId,
         },
       },
+      include: {
+        category: true,
+      },
     });
-    return updatedBook;
+    const prodUpdated = plainToClass(ReadProductEntity, updatedBook);
+    prodUpdated.favourites = updatedBook.favourites.length;
+    prodUpdated.categoryName = updatedBook.category.name;
+    return prodUpdated;
   }
 
   async unlike(userId: number, productId: number): Promise<any> {
     const book = await this.prisma.book.findUnique({
       where: {
         id: productId,
+      },
+      include: {
+        category: true,
       },
     });
 
@@ -238,17 +283,29 @@ export class ProductsService {
         data: {
           favourites: newFavArray,
         },
+        include: {
+          category: true,
+        },
       });
-      return updatedBook;
+      const product = plainToClass(ReadProductEntity, updatedBook);
+      product.favourites = updatedBook.favourites.length;
+      product.categoryName = updatedBook.category.name;
+      return product;
     }
-    return book;
+    const product = plainToClass(ReadProductEntity, book);
+    product.favourites = book.favourites.length;
+    product.categoryName = book.category.name;
+    return product;
   }
 
   async addToCart(
     userId: number,
     productId: number,
-    quantity: number,
+    cartQuantityDto: CartQuantityDto,
   ): Promise<ShowCartItemDto> {
+    if (cartQuantityDto.quantity <= 0) {
+      throw new NotAcceptableException('The quantity must be greater than 0');
+    }
     const book = await this.prisma.book.findUnique({
       where: {
         id: productId,
@@ -257,17 +314,11 @@ export class ProductsService {
     if (!book) {
       throw new NotFoundException();
     }
-    if (book.stock < quantity) {
+    if (book.stock < cartQuantityDto.quantity) {
       throw new NotAcceptableException(
         'The quantity is greater that the stock available',
       );
     }
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
-
     const getAlreadyInCart = await this.prisma.cart.findFirst({
       where: {
         userId: userId,
@@ -279,31 +330,29 @@ export class ProductsService {
         data: {
           userId: userId,
           bookId: productId,
-          quantity: quantity,
+          quantity: cartQuantityDto.quantity,
+        },
+      });
+    } else {
+      await this.prisma.cart.update({
+        where: {
+          id: getAlreadyInCart.id,
+        },
+        data: {
+          quantity: cartQuantityDto.quantity,
         },
       });
     }
-
-    await this.prisma.cart.update({
-      where: {
-        id: getAlreadyInCart.id,
-      },
-      data: {
-        quantity: quantity,
-      },
-    });
-
     const cartItem = plainToClass(ShowCartItemDto, {
-      username: user.username,
       title: book.name,
-      quantity: quantity,
+      quantity: cartQuantityDto.quantity,
       price: book.price,
-      pricetotal: quantity * book.price,
+      pricetotal: cartQuantityDto.quantity * book.price,
     });
     return cartItem;
   }
 
   async addPrivateFile(bookId: number, imageBuffer: Buffer, filename: string) {
-    return this.attachmentsService.uploadImages(imageBuffer, bookId, filename);
+    //return this.attachmentsService.uploadImages(imageBuffer, bookId, filename);
   }
 }

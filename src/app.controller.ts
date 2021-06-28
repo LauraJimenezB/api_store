@@ -28,7 +28,6 @@ export class AppController {
     return this.authService.confirm(emailToken);
   }
 
-  @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
   login(@Request() req) {
