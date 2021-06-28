@@ -1,6 +1,7 @@
 import { NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
+import { AttachmentsModule } from '../attachments/attachments.module';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
 import { CartQuantityDto } from './dto/cart-quantity.dto';
@@ -15,6 +16,7 @@ describe('ProductsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [PrismaService, AttachmentsModule],
       providers: [ProductsService, PrismaService],
     }).compile();
 
@@ -218,7 +220,7 @@ describe('ProductsService', () => {
   });
 
   afterAll(async () => {
-    prismaService.clearDatabase();
+    await prismaService.clearDatabase();
     await prismaService.$disconnect();
   });
 });

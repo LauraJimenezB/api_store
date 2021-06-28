@@ -36,6 +36,11 @@ export class AuthService {
     return null;
   }
 
+  async validateAccount(username: string): Promise<any> {
+    const user = await this.usersService.getUserToValidate(username);
+    return !user;
+  }
+
   async login(user: any) {
     const userRoles = await this.prisma.userRole.findMany({
       where: { userId: user.id },
