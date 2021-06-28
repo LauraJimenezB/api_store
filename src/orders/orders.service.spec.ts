@@ -76,10 +76,37 @@ describe('UsersService', () => {
     expect(ordersService).toBeDefined();
   });
 
-  describe('showOrder of user', () => {
-    it('should return a json with all users', async () => {
+  describe('cart of user', () => {
+    it('should return the items added to the cart by a user', async () => {
       const items = await ordersService.showCart(1);
       expect(items.orders).toHaveLength(2);
+    });
+  });
+
+  describe('show Order of user', () => {
+    it('should return the order after buying of a user', async () => {
+      const items = await ordersService.showOrder(1);
+      expect(items.orders).toHaveLength(2);
+    });
+  });
+
+  describe('show Order of user', () => {
+    it('should return the order after buying of a user', async () => {
+      const items = await ordersService.sendOrder(1);
+      expect(items.orders).toHaveLength(2);
+    });
+  });
+
+  describe('show Order of user', () => {
+    it('should return the order after buying of a user', async () => {
+      const items = await ordersService.showOrder(1);
+      console.log(items);
+      expect(items.orders).toHaveLength(2);
+    });
+    it('should throw an error if the user does not exists', async () => {
+      await expect(ordersService.showOrder(6)).rejects.toThrow(
+        'User not found',
+      );
     });
   });
 

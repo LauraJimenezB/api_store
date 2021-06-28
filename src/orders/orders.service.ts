@@ -38,13 +38,22 @@ export class OrdersService {
   }
 
   async showOrder(userId: number): Promise<ShowAllOrdersDto> {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
     const sale = await this.prisma.sale.findFirst({
       where: {
         userId,
       },
     });
     if (!sale) {
-      throw new NotFoundException();
+      throw new NotFoundException('No orders found');
     }
     const bookSales = await this.prisma.bookSale.findMany({
       where: {

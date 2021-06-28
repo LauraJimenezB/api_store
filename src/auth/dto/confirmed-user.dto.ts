@@ -1,7 +1,6 @@
 import { Exclude } from 'class-transformer';
 
 export class ConfirmedUserDto {
-  @Exclude()
   id: number;
   username: string;
   email: string;

@@ -14,7 +14,7 @@ describe('ProductsService', () => {
   let service: ProductsService;
   let prismaService: PrismaService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaService, AttachmentsModule],
       providers: [ProductsService, PrismaService],
@@ -22,13 +22,7 @@ describe('ProductsService', () => {
 
     service = module.get<ProductsService>(ProductsService);
     prismaService = module.get<PrismaService>(PrismaService);
-  });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-
-  beforeAll(async () => {
     const prisma = new PrismaClient();
     //create user
     await prisma.user.createMany({
@@ -84,6 +78,10 @@ describe('ProductsService', () => {
         },
       ],
     });
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
   });
 
   describe('show books', () => {

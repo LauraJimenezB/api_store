@@ -15,6 +15,5 @@ import { OrdersModule } from './orders/orders.module';
     ProductsModule,
     OrdersModule,
   ],
-  controllers: [],
 })
 export class AppModule {}

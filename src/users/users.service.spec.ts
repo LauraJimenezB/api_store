@@ -21,6 +21,7 @@ describe('UsersService', () => {
     await prismaService.user.createMany({
       data: [
         {
+          id: 1,
           username: 'anaC',
           fullName: 'Ana Castillo',
           email: 'example123@mail.com',
@@ -28,6 +29,7 @@ describe('UsersService', () => {
           hashActivation: '123456',
         },
         {
+          id: 2,
           username: 'MartG',
           fullName: 'Martin Gonzales',
           email: 'martin456@mail.com',
@@ -75,22 +77,18 @@ describe('UsersService', () => {
         'An operation failed because it depends on one or more records that were required but not found. Record to update not found.',
       );
     });
-    /* it('should throw an error when email is not an email', async () => {
-      await expect(
-        userService.updateUser(2, { email: 'examplegmail.com' }),
-      ).rejects.toThrow('email must be an email');
-    }); */
   });
 
   describe('set role to user', () => {
-    it('should return a user', async () => {
-      const user = await userService.setRole(1, 1);
+    /* it('should return a user', async () => {
+      const user = await userService.setAdminRole(1);
+      console.log(user);
       expect(user.username).toBe('Ana1246');
-      expect(user.roles).toContain('Client');
-    });
+      expect(user.roles).toContain('Manager');
+    }); */
     it('should throw an error when user does not exists in the database', async () => {
-      await expect(userService.setRole(6, 1)).rejects.toThrow(
-        NotFoundException,
+      await expect(userService.setAdminRole(6)).rejects.toThrow(
+        'User not found',
       );
     });
   });
