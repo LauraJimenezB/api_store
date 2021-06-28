@@ -12,6 +12,7 @@ import { sendEmailToken } from '../common/services/sendgrid.service';
 import { ConfirmedUserDto } from './dto/confirmed-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { LogInUserDto } from './dto/login-user.dto';
+import { UserDto } from 'src/users/dto/user.dto';
 
 async function validatePassword(
   plainTextPassword: string,
@@ -37,7 +38,7 @@ export class AuthService {
     return null;
   }
 
-  async validateAccount(id: number): Promise<User> {
+  async validateAccount(id: number): Promise<UserDto> {
     return await this.usersService.get(id);
   }
 
