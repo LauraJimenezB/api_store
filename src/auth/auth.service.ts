@@ -41,7 +41,7 @@ export class AuthService {
     return await this.usersService.get(id);
   }
 
-  async login(user: any) {
+  async login(user: LogInUserDto) {
     const userRoles = await this.prisma.userRole.findMany({
       where: { userId: user.id },
     });
