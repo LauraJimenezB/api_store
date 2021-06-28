@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Request,
   Post,
   UseGuards,
@@ -10,7 +9,6 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @ApiTags('authentication and authorization')
@@ -32,11 +30,5 @@ export class AuthController {
   @Post('login')
   login(@Request() req) {
     return this.authService.login(req.user);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('protected')
-  protected(@Request() req): string {
-    return req.user;
   }
 }
