@@ -1,6 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { plainToClass } from 'class-transformer';
 import { PrismaService } from '../common/services/prisma.service';
 import { UserDto } from './dto/user.dto';
@@ -20,25 +21,23 @@ describe('UsersService', () => {
 
     userService = new UsersService(prismaService);
 
-    await prismaService.user.create({
-      data: {
-        id: 1,
-        username: 'anaC',
-        fullName: 'Ana Castillo',
-        email: 'example123@mail.com',
-        password: 'pass123',
-        hashActivation: '123456',
-      },
-    });
-    await prismaService.user.create({
-      data: {
-        id: 2,
-        username: 'MartG',
-        fullName: 'Martin Gonzales',
-        email: 'example456@mail.com',
-        password: 'pass456',
-        hashActivation: '456789',
-      },
+    await prismaService.user.createMany({
+      data: [
+        {
+          username: 'anaC',
+          fullName: 'Ana Castillo',
+          email: 'example123@mail.com',
+          password: 'pass123',
+          hashActivation: '123456',
+        },
+        {
+          username: 'MartG',
+          fullName: 'Martin Gonzales',
+          email: 'martin456@mail.com',
+          password: 'pass456',
+          hashActivation: '456789',
+        },
+      ],
     });
   });
 
@@ -89,7 +88,6 @@ describe('UsersService', () => {
   describe('set role to user', () => {
     it('should return a user', async () => {
       const user = await userService.setRoleToUser(1, 1);
-      console.log(user);
       expect(user.username).toBe('Ana1246');
       expect(user.roles).toContain('Client');
     });
@@ -104,17 +102,17 @@ describe('UsersService', () => {
     it('should return the deleted user', async () => {
       const user = await userService.deleteUser(2);
       expect(user.fullName).toBe('Martin Gonzales');
-      expect(user.email).toBe('example456@mail.com');
+      expect(user.email).toBe('martin456@mail.com');
     });
     it('should throw an error when user does not exists in the database', async () => {
       await expect(userService.deleteUser(6)).rejects.toThrowError(
-        NotFoundException,
+        PrismaClientKnownRequestError,
       );
     });
   });
 
   afterAll(async () => {
-    await prismaService.user.deleteMany();
+    await prismaService.clearDatabase();
     await prismaService.$disconnect();
   });
 });

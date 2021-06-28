@@ -7,9 +7,9 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-  clearDatabase() {
+  /* clearDatabase() {
     throw new Error('Method not implemented.');
-  }
+  } */
   async onModuleInit() {
     await this.$connect();
   }
@@ -19,7 +19,7 @@ export class PrismaService
   }
 
   async clearDatabase() {
-    const tableNames = ['Category', 'Book'];
+    const tableNames = ['Category', 'Book', 'User', 'Cart'];
     try {
       for (const tableName of tableNames) {
         await this.$queryRaw(`DELETE FROM "${tableName}";`);

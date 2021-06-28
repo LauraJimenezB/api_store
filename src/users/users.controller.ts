@@ -21,11 +21,11 @@ export class UsersController {
 
   @Get()
   @Roles('MANAGER')
-  @UseGuards(AuthGuard('jwt'), RoleGuard)
   async getAllUsers() {
     return await this.usersService.getAllUsers();
   }
 
+  
   @Get(':id')
   getUser(@Param('id') id: number) {
     return this.usersService.getUser(id);

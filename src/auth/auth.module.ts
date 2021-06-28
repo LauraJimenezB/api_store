@@ -4,7 +4,7 @@ import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './local.strategy';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtStrategy } from '../common/guards/jwt.strategy';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { PrismaService } from '../common/services/prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
