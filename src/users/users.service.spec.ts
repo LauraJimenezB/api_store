@@ -1,10 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { plainToClass } from 'class-transformer';
 import { PrismaService } from '../common/services/prisma.service';
-import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 
 describe('UsersService', () => {
