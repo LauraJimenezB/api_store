@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaService } from 'src/common/services/prisma.service';
+import { PrismaService } from '../common/services/prisma.service';
 import { CommonModule } from '../common/common.module';
 import attachmentConfig from './config/attachments.config';
 import { AttachmentsService } from './services/attachments.service';

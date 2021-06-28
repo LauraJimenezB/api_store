@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { User } from '../users/entities/users.entity';
 import { PrismaService } from '../common/services/prisma.service';
 import { plainToClass } from 'class-transformer';
@@ -9,6 +9,9 @@ import * as bcrypt from 'bcrypt';
 import { generateEmailToken } from '../common/helpers/activationCodeHelper';
 import { getHash } from '../common/helpers/cipherHelper';
 import { sendEmailToken } from '../common/services/sendgrid.service';
+import { ConfirmedUserDto } from './dto/confirmed-user.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { LogInUserDto } from './dto/login-user.dto';
 
 async function validatePassword(
   plainTextPassword: string,
@@ -25,18 +28,16 @@ export class AuthService {
     private prisma: PrismaService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
+  async validateUser(username: string, password: string): Promise<User> {
     const user = await this.usersService.getUserToValidate(username);
-    //const validPassword = await validatePassword(password, user.password)
     const validPassword = validatePassword(password, user.password);
     if (user && validPassword) {
-      //const { password, username, ...rest } = user;
       return user;
     }
     return null;
   }
 
-  async login(user: any) {
+  async login(user: LogInUserDto) {
     const userRoles = await this.prisma.userRole.findMany({
       where: { userId: user.id },
     });
@@ -49,7 +50,7 @@ export class AuthService {
     };
   }
 
-  async signup(user: CreateUserDto): Promise<string> {
+  async signup(user: CreateUserDto): Promise<VerifyEmailDto> {
     const emailToken = generateEmailToken();
     const hash = getHash(user.password);
     const createdUser = await this.prisma.user.create({
@@ -61,11 +62,20 @@ export class AuthService {
         hashActivation: emailToken,
       },
     });
+    const getUser = await this.prisma.user.findUnique({
+      where: { email: user.email },
+    });
+    await this.prisma.userRole.create({
+      data: {
+        userId: getUser.id,
+        roleId: 1,
+      },
+    });
     sendEmailToken(createdUser.email, createdUser.hashActivation);
-    return 'Verify your email';
+    return { status: 200, message: 'Verify your email' };
   }
 
-  async confirm(emailToken: string): Promise<User> {
+  async confirm(emailToken: string): Promise<ConfirmedUserDto> {
     const user = await this.prisma.user.findFirst({
       where: {
         hashActivation: emailToken,
@@ -79,6 +89,6 @@ export class AuthService {
         confirmedAt: new Date(),
       },
     });
-    return plainToClass(User, confirmedUser);
+    return plainToClass(ConfirmedUserDto, confirmedUser);
   }
 }

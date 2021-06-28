@@ -1,6 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
+import { AttachmentsModule } from '../attachments/attachments.module';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -13,6 +14,7 @@ describe('ProductsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [PrismaService, AttachmentsModule],
       providers: [ProductsService, PrismaService],
     }).compile();
 
@@ -137,12 +139,12 @@ describe('ProductsService', () => {
     it('should return the books', async () => {
       const category = 'Fantasy';
       const allBooks = await service.getByCategory(category);
-      expect(allBooks).toHaveLength(2);
+      expect(allBooks).toHaveLength(1);
     });
   });
 
   afterAll(async () => {
-    prismaService.clearDatabase();
+    await prismaService.clearDatabase();
     await prismaService.$disconnect();
   });
 });
