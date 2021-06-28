@@ -11,6 +11,7 @@ import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/guards/local-auth.guard';
 import { CreateUserDto } from './auth/dto/create-user.dto';
+import { LogInUserDto } from './auth/dto/login-user.dto';
 
 @Controller()
 export class AppController {
@@ -28,8 +29,8 @@ export class AppController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Request() req) {
-    return this.authService.login(req.user);
+  login(@Body() body: LogInUserDto) {
+    return this.authService.login(body.email, body.password);
   }
 
   @UseGuards(JwtAuthGuard)

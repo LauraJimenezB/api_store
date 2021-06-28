@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -37,7 +37,13 @@ export class AuthService {
     return null;
   }
 
-  async login(user: LogInUserDto) {
+  async login(email, password) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    const validatedUser = this.validateUser(user.username, password);
+    console.log(validatedUser);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const userRoles = await this.prisma.userRole.findMany({
       where: { userId: user.id },
     });

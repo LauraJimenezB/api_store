@@ -1,6 +1,7 @@
 import { Exclude } from 'class-transformer';
 import {
   IsEmail,
+  isNotEmpty,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -8,16 +9,18 @@ import {
 } from 'class-validator';
 
 export class LogInUserDto {
-  @IsNumber()
+  @Exclude()
   id: number;
-
-  @IsString()
-  @IsNotEmpty()
+  @Exclude()
   username: string;
 
   @IsNotEmpty()
   @IsEmail()
   email: string;
+
+  @IsNotEmpty()
+  @IsString()
+  password: string;
 
   @IsOptional()
   @IsString()
@@ -28,8 +31,6 @@ export class LogInUserDto {
 
   @Exclude()
   fullName: string;
-  @Exclude()
-  password: string;
   @Exclude()
   emailVerified: boolean;
   @Exclude()
