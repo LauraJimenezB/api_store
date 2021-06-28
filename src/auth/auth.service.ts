@@ -1,7 +1,7 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { User } from '../users/entities/users.entity';
 import { PrismaService } from '../common/services/prisma.service';
 import { plainToClass } from 'class-transformer';
@@ -9,6 +9,9 @@ import * as bcrypt from 'bcrypt';
 import { generateEmailToken } from '../common/helpers/activationCodeHelper';
 import { getHash } from '../common/helpers/cipherHelper';
 import { sendEmailToken } from '../common/services/sendgrid.service';
+import { ConfirmedUserDto } from './dto/confirmed-user.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { LogInUserDto } from './dto/login-user.dto';
 
 async function validatePassword(
   plainTextPassword: string,
@@ -51,7 +54,7 @@ export class AuthService {
     };
   }
 
-  async signup(user: CreateUserDto): Promise<string> {
+  async signup(user: CreateUserDto): Promise<VerifyEmailDto> {
     let userFound = await this.prisma.user.findUnique({
       where: { username: user.username },
     });
@@ -75,11 +78,20 @@ export class AuthService {
         hashActivation: emailToken,
       },
     });
+    const getUser = await this.prisma.user.findUnique({
+      where: { email: user.email },
+    });
+    await this.prisma.userRole.create({
+      data: {
+        userId: getUser.id,
+        roleId: 1,
+      },
+    });
     sendEmailToken(createdUser.email, createdUser.hashActivation);
-    return 'Verify your email';
+    return { status: 200, message: 'Verify your email' };
   }
 
-  async confirm(emailToken: string): Promise<User> {
+  async confirm(emailToken: string): Promise<ConfirmedUserDto> {
     const user = await this.prisma.user.findFirst({
       where: {
         hashActivation: emailToken,
@@ -93,6 +105,6 @@ export class AuthService {
         confirmedAt: new Date(),
       },
     });
-    return plainToClass(User, confirmedUser);
+    return plainToClass(ConfirmedUserDto, confirmedUser);
   }
 }

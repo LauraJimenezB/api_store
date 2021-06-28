@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { CreateUserDto } from './dto/create-user.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
@@ -18,7 +19,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('signup')
-  createUser(@Body() body) {
+  createUser(@Body() body: CreateUserDto) {
     return this.authService.signup(body);
   }
 
@@ -29,7 +30,7 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Request() req): any {
+  login(@Request() req) {
     return this.authService.login(req.user);
   }
 
