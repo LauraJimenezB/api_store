@@ -5,7 +5,6 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from '../common/guards/jwt.strategy';
-import { CreateUserDto } from '../users/dto/create-user.dto';
 import { PrismaService } from '../common/services/prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 //import { APP_GUARD } from '@nestjs/core';
@@ -30,7 +29,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     AuthService,
     LocalStrategy,
     JwtStrategy,
-    CreateUserDto,
     PrismaService,
     //{ provide: APP_GUARD, useClass: JwtStrategy },
   ],
