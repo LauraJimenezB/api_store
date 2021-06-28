@@ -9,7 +9,7 @@ import { UserDto } from './dto/user.dto';
 export class UsersService {
   constructor(private prisma: PrismaService) { }
 
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers(): Promise<UserDto[]> {
     const users = await this.prisma.user.findMany({
       select: {
         email: true,
@@ -18,17 +18,17 @@ export class UsersService {
         password: true,
       },
     });
-    return users;
+    return plainToClass(UserDto, users);
   }
 
-  async getUser(userId: number): Promise<User> {
+  async getUser(userId: number): Promise<UserDto> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
     if(!user) {
       throw new NotFoundException();
     }
-    return user;
+    return plainToClass(UserDto, user);
   }
 
   async getUserToValidate(username: string): Promise<User> {
@@ -38,7 +38,7 @@ export class UsersService {
     return user;
   }
 
-  async updateUser(id: number, userContent): Promise<User> {
+  async updateUser(id: number, userContent): Promise<UserDto> {
     const user = this.prisma.user.findUnique({ where: { id } });
 
     if(!user) {
@@ -51,34 +51,27 @@ export class UsersService {
       email: userContent.email,
       password: userContent.password,
     } });
-    return updatedUser;
+    return plainToClass(UserDto, updatedUser);
   }
 
-  async deleteUser(id: number): Promise<User> {
+  async deleteUser(id: number): Promise<UserDto> {
     const user = this.prisma.user.delete({ where: { id } });
 
     if(!user) {
       throw new NotFoundException();
     }
 
-    return user;
+    return plainToClass(UserDto, user);
   }
 
-  async setRoleToUser(userId: number, roleId: number) : Promise<UserDto> {
+  async setAdminRole(userId: number) : Promise<UserDto> {
+    const roleId = 2;
     const userExists = await this.prisma.user.findUnique({
       where: { id: userId },
     });
 
     if(!userExists) {
-      throw new NotFoundException();
-    }
-
-    const roleExists = await this.prisma.role.findUnique({
-      where: { id: roleId },
-    });
-
-    if(!roleExists) {
-      throw new NotFoundException();
+      throw new NotFoundException('User not found');
     }
 
     const userRoleAlreadySet = await this.prisma.userRole.findFirst({
