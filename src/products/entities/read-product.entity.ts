@@ -1,3 +1,5 @@
+import { Exclude } from 'class-transformer';
+
 export class ReadProductEntity {
   name: string;
   authors: string[];
@@ -7,4 +9,8 @@ export class ReadProductEntity {
   categoryName: string;
   disabled: boolean;
   favourites: number;
+  @Exclude()
+  categoryId: number;
+  @Exclude()
+  category;
 }

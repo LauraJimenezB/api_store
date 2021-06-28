@@ -1,14 +1,12 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { Reflector } from '@nestjs/core';
-import { Request } from 'express';
-import { AuthService } from '../../auth/auth.service';
+import { AuthService } from '../auth.service';
+import { PayloadDto } from '../dto/payload.dto';
 
 @Injectable()
-/* implements CanActivate */
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly configService: ConfigService,
@@ -22,14 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  /* async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.get(IS_PUBLIC_KEY, context.getHandler());
-    if (isPublic) {
-      return true;
-    }
-  } */
-
-  async validate(payload: any) {
+  async validate(payload: any): Promise<PayloadDto> {
     return {
       id: payload.sub,
       username: payload.username,
