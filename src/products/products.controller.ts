@@ -15,11 +15,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
-
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
-
-import { Public } from 'src/common/decorators/public.decorator';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { CartQuantityDto } from './dto/cart-quantity.dto';
 import { CreateProductDto } from './dto/create-product.dto';

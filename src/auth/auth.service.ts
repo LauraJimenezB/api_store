@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
@@ -26,19 +26,16 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.usersService.getUserToValidate(username);
-    //const validPassword = await validatePassword(password, user.password)
+    const user = await this.usersService.getByUsername(username);
     const validPassword = validatePassword(password, user.password);
     if (user && validPassword) {
-      //const { password, username, ...rest } = user;
       return user;
     }
     return null;
   }
 
-  async validateAccount(username: string): Promise<any> {
-    const user = await this.usersService.getUserToValidate(username);
-    return !user;
+  async validateAccount(id: number): Promise<User> {
+    return await this.usersService.get(id);
   }
 
   async login(user: any) {
@@ -55,6 +52,18 @@ export class AuthService {
   }
 
   async signup(user: CreateUserDto): Promise<string> {
+    let userFound = await this.prisma.user.findUnique({
+      where: { username: user.username },
+    });
+    if (userFound) {
+      throw new NotAcceptableException('User is already registered');
+    }
+    userFound = await this.prisma.user.findUnique({
+      where: { email: user.email },
+    });
+    if (userFound) {
+      throw new NotAcceptableException('User is already registered');
+    }
     const emailToken = generateEmailToken();
     const hash = getHash(user.password);
     const createdUser = await this.prisma.user.create({

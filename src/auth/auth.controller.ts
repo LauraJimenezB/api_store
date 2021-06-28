@@ -7,12 +7,14 @@ import {
   Body,
   Param,
 } from '@nestjs/common';
-import { AuthService } from './auth/auth.service';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { LocalAuthGuard } from './auth/guards/local-auth.guard';
+import { ApiTags } from '@nestjs/swagger';
+import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
-@Controller()
-export class AppController {
+@ApiTags('authentication and authorization')
+@Controller('auth')
+export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('signup')
