@@ -1,9 +1,9 @@
-import { Attachment } from '@prisma/client';
+//import { Attachment } from '@prisma/client';
 import { Exclude, Expose } from 'class-transformer';
 import { ContentTypeEnum, FileExtensionEnum } from '../enums/attachment.enum';
 
 @Exclude()
-export class AttachmentDto implements Attachment {
+export class AttachmentDto /*implements Attachment*/ {
   @Expose()
   readonly id: number;
 

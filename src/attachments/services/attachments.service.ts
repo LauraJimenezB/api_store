@@ -9,7 +9,7 @@ import { AttachmentDto } from '../dto/attachment.dto';
 import { AttachmentDirectoryEnum } from '../enums/attachment.enum';
 import { plainToClass } from 'class-transformer';
 import { nanoid } from 'nanoid';
-import { Attachment } from '@prisma/client';
+//import { Attachment } from '@prisma/client';
 
 @Injectable()
 export class AttachmentsService {
@@ -30,22 +30,22 @@ export class AttachmentsService {
     this.s3 = new S3();
   }
 
-  async uploadImages(dataBuffer: Buffer, bookId: number, filename: string) {
-    const s3 = new S3();
-    const uploadResult = await s3
-      .upload({
-        Bucket: this.configService.bucket,
-        Body: dataBuffer,
-        Key: `${uuid()}-${filename}`,
-      })
-      .promise();
+  // async uploadImages(dataBuffer: Buffer, bookId: number, filename: string) {
+  //   const s3 = new S3();
+  //   const uploadResult = await s3
+  //     .upload({
+  //       Bucket: this.configService.bucket,
+  //       Body: dataBuffer,
+  //       Key: `${uuid()}-${filename}`,
+  //     })
+  //     .promise();
 
-    const newFile = this.prismaService.attachment.create({
-      data: {
-        key: uploadResult.Key,
-        bookId,
-      },
-    });
-    return newFile;
-  }
+  //   const newFile = this.prismaService.attachment.create({
+  //     data: {
+  //       key: uploadResult.Key,
+  //       bookId,
+  //     },
+  //   });
+  //   return newFile;
+  // }
 }

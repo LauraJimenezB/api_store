@@ -359,6 +359,6 @@ export class ProductsService {
   }
 
   async addPrivateFile(bookId: number, imageBuffer: Buffer, filename: string) {
-    return this.attachmentsService.uploadImages(imageBuffer, bookId, filename);
+    //return this.attachmentsService.uploadImages(imageBuffer, bookId, filename);
   }
 }

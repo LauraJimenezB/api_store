@@ -27,6 +27,6 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.useGlobalFilters(new HttpExceptionFilter());
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 8080);
 }
 bootstrap();
