@@ -7,7 +7,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PrismaService } from '../common/services/prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-//import { APP_GUARD } from '@nestjs/core';
+import { AuthController } from './auth.controller';
 
 @Module({
   imports: [
@@ -25,13 +25,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
   ],
-  providers: [
-    AuthService,
-    LocalStrategy,
-    JwtStrategy,
-    PrismaService,
-    //{ provide: APP_GUARD, useClass: JwtStrategy },
-  ],
-  exports: [AuthService, JwtModule],
+  providers: [AuthService, LocalStrategy, JwtStrategy, PrismaService],
+  controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule {}

@@ -7,29 +7,21 @@ import {
   Patch,
   Post,
   Query,
-  Req,
   Request,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
-
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
-
-import { Public } from 'src/common/decorators/public.decorator';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { CartQuantityDto } from './dto/cart-quantity.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
-import { Roles } from 'src/users/roles/role.decorator';
-import { AttachmentsService } from 'src/attachments/services/attachments.service';
-import { AttachmentDto } from 'src/attachments/dto/attachment.dto';
-import { UploadImageDto } from 'src/attachments/dto/upload-image.dto';
-import { CreateAttachmentDto } from 'src/attachments/dto/create-attachment.dto';
+import { Roles } from '../users/roles/role.decorator';
+import { AttachmentsService } from '../attachments/services/attachments.service';
+import { AttachmentDto } from '../attachments/dto/attachment.dto';
+import { UploadImageDto } from '../attachments/dto/upload-image.dto';
+import { CreateAttachmentDto } from '../attachments/dto/create-attachment.dto';
 
 @ApiTags('books')
 @Controller('products')
