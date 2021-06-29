@@ -61,7 +61,6 @@ export class ProductsController {
 
   @Get('category/:name')
   getByCategory(@Param('name') categoryName: string) {
-    console.log('cateeeee');
     return this.productsService.getByCategory(categoryName);
   }
 
@@ -102,31 +101,31 @@ export class ProductsController {
     return this.productsService.addToCart(req.user.id, bookId, body);
   }
 
-  @Post(':id/uploadImage')
-  @UseGuards(JwtAuthGuard)
-  @Roles('MANAGER')
-  @UseInterceptors(FileInterceptor('file'))
-  async addPrivateFile(
-    @Param('id') bookId: number,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    console.log(file);
-    return this.productsService.addPrivateFile(
-      bookId,
-      file.buffer,
-      file.originalname,
-    );
-  }
+  // @Post(':id/uploadImage')
+  // @UseGuards(JwtAuthGuard)
+  // @Roles('MANAGER')
+  // @UseInterceptors(FileInterceptor('file'))
+  // async addPrivateFile(
+  //   @Param('id') bookId: number,
+  //   @UploadedFile() file: Express.Multer.File,
+  // ) {
+  //   console.log(file);
+  //   return this.productsService.addPrivateFile(
+  //     bookId,
+  //     file.buffer,
+  //     file.originalname,
+  //   );
+  // }
 
-  @Get(':id/getImages')
-  @UseGuards(JwtAuthGuard)
-  async getAllPrivateFiles(@Param('id') bookId: number) {
-    return this.productsService.getImagesByProduct(bookId);
-  }
+  // @Get(':id/getImages')
+  // @UseGuards(JwtAuthGuard)
+  // async getAllPrivateFiles(@Param('id') bookId: number) {
+  //   return this.productsService.getImagesByProduct(bookId);
+  // }
 
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file.originalname);
-  }
+  // @Post('upload')
+  // @UseInterceptors(FileInterceptor('file'))
+  // uploadFile(@UploadedFile() file: Express.Multer.File) {
+  //   console.log(file.originalname);
+  // }
 }

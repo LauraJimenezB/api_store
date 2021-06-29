@@ -5,10 +5,10 @@ import { AuthModule } from '../auth/auth.module';
 
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
-import { AttachmentsModule } from '../attachments/attachments.module';
+//import { AttachmentsModule } from '../attachments/attachments.module';
 
 @Module({
-  imports: [AuthModule, AttachmentsModule],
+  imports: [AuthModule],
   controllers: [ProductsController],
   providers: [ProductsService, PrismaService],
   exports: [ProductsService],
