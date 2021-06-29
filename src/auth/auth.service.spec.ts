@@ -34,7 +34,7 @@ describe('AuthService', () => {
     expect(authService).toBeDefined();
   });
 
-  describe('log in', () => {
+  describe('log in user', () => {
     it('should return the order after buying of a user', async () => {
       const user = await authService.login('example123@mail.com', 'pass123');
       console.log(user);
