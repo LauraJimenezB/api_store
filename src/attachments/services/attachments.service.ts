@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { PrismaService } from '../../common/services/prisma.service';
-import { config as configAWS, S3 } from '../../../../book-store-challenge-nest/node_modules/aws-sdk';
+import { config as configAWS, S3 } from '../../.././node_modules/aws-sdk';
 import attachmentConfig from '../config/attachments.config';
 import { CreateAttachmentDto } from '../dto/create-attachment.dto';
 import { AttachmentDto } from '../dto/attachment.dto';
