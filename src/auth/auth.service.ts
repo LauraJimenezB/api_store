@@ -103,7 +103,7 @@ export class AuthService {
       },
     });
     sendEmailToken(createdUser.email, createdUser.hashActivation);
-    return { status: 200, message: 'Verify your email' };
+    return { status: 201, message: 'Verify your email' };
   }
 
   async confirm(emailToken: string): Promise<ConfirmedUserDto> {
