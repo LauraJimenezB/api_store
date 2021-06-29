@@ -1,4 +1,8 @@
 {
+  "compileOnSave": false, 
+  "typeRoots": [
+      "node_modules/@types"
+    ],
   "compilerOptions": {
     "module": "commonjs",
     "declaration": true,
