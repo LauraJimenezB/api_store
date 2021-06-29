@@ -6,7 +6,7 @@ import { ProductsModule } from './products/products.module';
 import { CommonModule } from './common/common.module';
 import { OrdersModule } from './orders/orders.module';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard'
+import { RoleGuard } from './users/roles/guard/roles.guard'
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard'
   providers: [
   {
     provide: APP_GUARD,
-    useClass: JwtAuthGuard,
+    useClass: RoleGuard,
   },
 ],
 })
