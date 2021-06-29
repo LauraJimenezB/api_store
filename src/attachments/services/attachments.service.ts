@@ -3,13 +3,11 @@ import { ConfigType } from '@nestjs/config';
 import { PrismaService } from '../../common/services/prisma.service';
 import { config as configAWS, S3 } from 'aws-sdk';
 import attachmentConfig from '../config/attachments.config';
-import { v4 as uuid } from 'uuid';
 import { CreateAttachmentDto } from '../dto/create-attachment.dto';
 import { AttachmentDto } from '../dto/attachment.dto';
 import { AttachmentDirectoryEnum } from '../enums/attachment.enum';
 import { plainToClass } from 'class-transformer';
 import { nanoid } from 'nanoid';
-import { Attachment } from '@prisma/client';
 
 @Injectable()
 export class AttachmentsService {
@@ -65,12 +63,12 @@ export class AttachmentsService {
       input.uuid,
     );
     let extension;
-    if(type==='image/png') {
-      extension = 'png'
-    } else if (type==='image/jpg') {
-      extension = 'jpg'
+    if (type === 'image/png') {
+      extension = 'png';
+    } else if (type === 'image/jpg') {
+      extension = 'jpg';
     } else {
-      extension = 'jpeg'
+      extension = 'jpeg';
     }
     const attachment = await this.prismaService.attachment.create({
       data: {
@@ -88,16 +86,7 @@ export class AttachmentsService {
       Expires: this.configService.expirationTime,
     });
     return plainToClass(AttachmentDto, { signedUrl, ...attachment });
-  } 
-  /* async uploadImages(type: string, bookId: number): Promise<{ url: string }> {
-    //type = 'image/jpeg';
-    const { key, url } = this.preSignedPutURL();
-    await this.prismaService.attachment.create({
-      data: { key, contentType: type, bookId },
-    });
-    console.log(this.configService.secretAccessKey);
-    return { url };
-  } */
+  }
 
   async getImages(bookId: number): Promise<AttachmentDto[]> {
     const attachments = await this.prismaService.attachment.findMany({
@@ -115,33 +104,5 @@ export class AttachmentsService {
       );
     }); */
   }
-  /* 
   
-  async uploadImages(dataBuffer: Buffer, bookId: number, filename: string) {
-    const s3 = new S3();
-    const uploadResult = await s3
-      .upload({
-        Bucket: this.configService.bucket,
-        Body: dataBuffer,
-        Key: `${uuid()}-${filename}`,
-      })
-      .promise();
-
-    const newFile = this.prismaService.attachment.create({
-      data: {
-        key: uploadResult.Key,
-        bookId,
-      },
-    });
-    return newFile;
-  }
-
-  public async generatePresignedUrl(key: string) {
-    const s3 = new S3();
-
-    return s3.getSignedUrlPromise('getObject', {
-      Bucket: this.configService.bucket,
-      Key: key,
-    });
-  } */
 }

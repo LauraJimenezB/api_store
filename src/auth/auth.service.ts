@@ -9,20 +9,20 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from '../users/entities/users.entity';
 import { PrismaService } from '../common/services/prisma.service';
 import { plainToClass } from 'class-transformer';
-import * as bcrypt from 'bcrypt';
 import { generateEmailToken } from '../common/helpers/activationCodeHelper';
-import { getHash } from '../common/helpers/cipherHelper';
+import { compare, getHash } from '../common/helpers/cipherHelper';
 import { sendEmailToken } from '../common/services/sendgrid.service';
 import { ConfirmedUserDto } from './dto/confirmed-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
-import { LogInUserDto } from './dto/login-user.dto';
 import { UserDto } from 'src/users/dto/user.dto';
+import jwt_decode from 'jwt-decode';
+import { DecodedDto } from 'src/users/dto/decoded.dto';
 
-async function validatePassword(
+function validatePassword(
   plainTextPassword: string,
   hashedPassword: string,
-): Promise<boolean> {
-  return await bcrypt.compareSync(plainTextPassword, hashedPassword);
+): boolean {
+  return compare(plainTextPassword, hashedPassword);
 }
 
 @Injectable()
@@ -70,6 +70,17 @@ export class AuthService {
     };
   }
 
+  async logout(req) {
+    const decoded: DecodedDto = jwt_decode(req.header('Authorization'));
+    await this.prisma.user.update({
+      where: { id: decoded.sub },
+      data: {
+        active: false,
+      },
+    });
+    return {message: 'User has logged out'}
+  }
+
   async signup(user: CreateUserDto): Promise<VerifyEmailDto> {
     let userFound = await this.prisma.user.findUnique({
       where: { username: user.username },
@@ -105,7 +116,7 @@ export class AuthService {
       },
     });
     sendEmailToken(createdUser.email, createdUser.hashActivation);
-    return { status: 200, message: 'Verify your email' };
+    return { status: 201, message: 'Verify your email' };
   }
 
   async confirm(emailToken: string): Promise<ConfirmedUserDto> {

@@ -66,12 +66,10 @@ export class UsersService {
     return plainToClass(UserDto, user);
   }
 
-  async setAdminRole(userId: number): Promise<UserDto> {
-    const roleId = 2;
+  async setAdminRole(userId: number, roleId: number): Promise<UserDto> {
     const userExists = await this.prisma.user.findUnique({
       where: { id: userId },
     });
-
     if (!userExists) {
       throw new NotFoundException('User not found');
     }

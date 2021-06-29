@@ -377,10 +377,6 @@ export class ProductsService {
     return attachment;
   }
 
-  /* async addPrivateFile(bookId: number, imageBuffer: Buffer, filename: string) {
-    return this.attachmentsService.uploadImages(imageBuffer, bookId, filename);
-  } */
-
   /* async getImagesByProduct(productId: number) {
     const productImages = await this.prisma.attachment.findMany({
       where: {
