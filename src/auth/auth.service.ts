@@ -15,6 +15,8 @@ import { sendEmailToken } from '../common/services/sendgrid.service';
 import { ConfirmedUserDto } from './dto/confirmed-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { UserDto } from 'src/users/dto/user.dto';
+import jwt_decode from 'jwt-decode';
+import { DecodedDto } from 'src/users/dto/decoded.dto';
 
 function validatePassword(
   plainTextPassword: string,
@@ -66,6 +68,17 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async logout(req) {
+    const decoded: DecodedDto = jwt_decode(req.header('Authorization'));
+    await this.prisma.user.update({
+      where: { id: decoded.sub },
+      data: {
+        active: false,
+      },
+    });
+    return {message: 'User has logged out'}
   }
 
   async signup(user: CreateUserDto): Promise<VerifyEmailDto> {

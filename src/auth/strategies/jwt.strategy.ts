@@ -37,7 +37,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
     if (!user.active) {
-      throw new ForbiddenException('Log in in first');
+      throw new ForbiddenException('Log in first');
     }
     return plainToClass(PayloadDto, payloadObj);
   }
