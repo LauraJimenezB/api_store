@@ -5,7 +5,10 @@ import {
 } from '@nestjs/common';
 import { Category } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
-//import { AttachmentsService } from '../attachments/services/attachments.service';
+import { AttachmentDto } from 'src/attachments/dto/attachment.dto';
+import { CreateAttachmentInput } from '../attachments/dto/create-attachment-input.dto';
+import { ParentEnum } from 'src/attachments/enums/attachment.enum';
+import { AttachmentsService } from '../attachments/services/attachments.service';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
 import { CartQuantityDto } from './dto/cart-quantity.dto';
@@ -16,7 +19,7 @@ import { ReadProductEntity } from './entities/read-product.entity';
 
 @Injectable()
 export class ProductsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private attachmentsService: AttachmentsService) {}
   //private attachmentsService: AttachmentsService,
 
   async getAll(
@@ -350,29 +353,53 @@ export class ProductsService {
     return cartItem;
   }
 
-  // async addPrivateFile(bookId: number, imageBuffer: Buffer, filename: string) {
-  //   return this.attachmentsService.uploadImages(imageBuffer, bookId, filename);
-  // }
+  async uploadImagesToBook(
+    bookId: number,
+    type: string,
+    input: CreateAttachmentInput,
+  ): Promise<AttachmentDto> {
+    const book = await this.prisma.book.findUnique({ where: { id: bookId } });
+    const attachment = await this.attachmentsService.uploadImages(
+      bookId,
+      type,
+      {
+        ...input,
+        parentType: ParentEnum.PRODUCT,
+        uuid: book.id.toString(10),
+      },
+    );
 
-  // async getImagesByProduct(productId: number) {
-  //   const productImages = await this.prisma.attachment.findMany({
-  //     where: {
-  //       bookId: productId,
-  //     },
-  //   });
-  //   if (productImages) {
-  //     return Promise.all(
-  //       productImages.map(async (file) => {
-  //         const url = await this.attachmentsService.generatePresignedUrl(
-  //           file.key,
-  //         );
-  //         return {
-  //           ...file,
-  //           url,
-  //         };
-  //       }),
-  //     );
-  //   }
-  //   throw new NotFoundException('Images with this bookId do not exist');
-  // }
+    await this.prisma.book.update({
+      where: { id: book.id },
+      data: { images: { connect: { id: attachment.id } } },
+    });
+
+    return attachment;
+  }
+
+  /* async addPrivateFile(bookId: number, imageBuffer: Buffer, filename: string) {
+    return this.attachmentsService.uploadImages(imageBuffer, bookId, filename);
+  } */
+
+  /* async getImagesByProduct(productId: number) {
+    const productImages = await this.prisma.attachment.findMany({
+      where: {
+        bookId: productId,
+      },
+    });
+    if (productImages) {
+      return Promise.all(
+        productImages.map(async (file) => {
+          const url = await this.attachmentsService.generatePresignedUrl(
+            file.key,
+          );
+          return {
+            ...file,
+            url,
+          };
+        }),
+      );
+    }
+    throw new NotFoundException('Images with this bookId do not exist');
+  } */
 }

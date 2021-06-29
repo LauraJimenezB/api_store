@@ -22,13 +22,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_SECRET'),
     });
-  }
+  };
+
 
   async validate(payload: JWTPayloadType): Promise<PayloadDto> {
     const payloadObj = {
       id: payload.sub,
       username: payload.username,
       roles: payload.roles,
+      active: true,
     };
     const user = await this.authService.validateAccount(payloadObj.id);
     if (!user) {

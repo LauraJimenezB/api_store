@@ -17,12 +17,19 @@ import { CartQuantityDto } from './dto/cart-quantity.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
-import { Roles } from 'src/users/roles/role.decorator';
+import { Roles } from '../users/roles/role.decorator';
+import { AttachmentsService } from '../attachments/services/attachments.service';
+import { AttachmentDto } from '../attachments/dto/attachment.dto';
+import { UploadImageDto } from '../attachments/dto/upload-image.dto';
+import { CreateAttachmentDto } from '../attachments/dto/create-attachment.dto';
 
 @ApiTags('books')
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly attachmentsService: AttachmentsService,
+  ) {}
 
   @Get()
   async getBooks(@Query() paginationQueryDto: PaginationQueryDto) {
@@ -97,31 +104,56 @@ export class ProductsController {
     return this.productsService.addToCart(req.user.id, bookId, body);
   }
 
-  // @Post(':id/uploadImage')
-  // @UseGuards(JwtAuthGuard)
-  // @Roles('MANAGER')
-  // @UseInterceptors(FileInterceptor('file'))
-  // async addPrivateFile(
-  //   @Param('id') bookId: number,
-  //   @UploadedFile() file: Express.Multer.File,
-  // ) {
-  //   console.log(file);
-  //   return this.productsService.addPrivateFile(
-  //     bookId,
-  //     file.buffer,
-  //     file.originalname,
-  //   );
-  // }
+  /* @Post(':id/uploadImage')
+  @UseGuards(JwtAuthGuard)
+  @Roles('MANAGER')
+  @UseInterceptors(FileInterceptor('file'))
+  async addPrivateFile(
+    @Param('id') bookId: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    console.log(file);
+    return this.productsService.addPrivateFile(
+      bookId,
+      file.buffer,
+      file.originalname,
+    );
+  } */
+  /* @Post(':id/image/upload')
+  uploadProductImage(
+    @Body() params: UploadImageDto,
+    @GetUser() user: User,
+  ): Promise<PreSignedUrlDto> {
+    return this.productsService.addPrivateFile(user.id, params);
+  }
 
-  // @Get(':id/getImages')
-  // @UseGuards(JwtAuthGuard)
-  // async getAllPrivateFiles(@Param('id') bookId: number) {
-  //   return this.productsService.getImagesByProduct(bookId);
-  // }
+  @Get(':id/getImages')
+  @UseGuards(JwtAuthGuard)
+  async getAllPrivateFiles(@Param('id') bookId: number) {
+    return this.productsService.getImagesByProduct(bookId);
+  } */
 
-  // @Post('upload')
-  // @UseInterceptors(FileInterceptor('file'))
-  // uploadFile(@UploadedFile() file: Express.Multer.File) {
-  //   console.log(file.originalname);
-  // }
+  /* @Post(':id/image/upload')
+  createAttachment(
+    @Body('type') type: string,
+    @Request() req,
+    @Param('id') bookId: number,
+  ): Promise<{ url: string }> {
+    console.log(req)
+    return this.attachmentsService.uploadImages(type, bookId);
+  } */
+
+  @Post(':id/image/upload')
+  createAttachment(
+    @Body() params: CreateAttachmentDto,
+    @Request() req,
+    @Param('id') bookId: number,
+  ): Promise<AttachmentDto> {
+    return this.productsService.uploadImagesToBook(bookId, req.headers['content-type'], params);
+  }
+
+  @Get('images/:id')
+  getAttachments(@Param('id') bookId: number): Promise<AttachmentDto[]> {
+    return this.attachmentsService.getImages(bookId);
+  }
 }

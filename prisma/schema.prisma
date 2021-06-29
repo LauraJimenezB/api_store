@@ -104,4 +104,7 @@ model Attachment {
   bookId Int
   book    Book[]  @relation(fields: [bookId], references: [id])
   createdAt   DateTime @default(now()) @map(name: "created_at")
+  contentType String
+  ext String
+  path String
 }

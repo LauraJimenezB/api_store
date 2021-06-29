@@ -47,7 +47,6 @@ export class AuthService {
   async login(email, password) {
     const user = await this.prisma.user.findUnique({ where: { email } });
     const validatedUser = this.validateUser(user.username, password);
-    console.log(validatedUser);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -91,6 +90,7 @@ export class AuthService {
         email: user.email,
         password: hash,
         hashActivation: emailToken,
+        active: true,
       },
     });
     const getUser = await this.prisma.user.findUnique({
