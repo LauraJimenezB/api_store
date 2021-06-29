@@ -7,7 +7,7 @@ sendgrid.setApiKey(process.env.API_KEY);
 export const sendEmailToken = (email: string, emailToken: string) => {
   const msg = {
     to: email,
-    from: 'hope.acmu@gmail.com', // sender
+    from: 'hope.acmu@gmail.com', // sender email
     subject: 'Confirm email',
     html: `https://book-store-challenge-nest.herokuapp.com/auth/${emailToken}/confirm`,
   };
