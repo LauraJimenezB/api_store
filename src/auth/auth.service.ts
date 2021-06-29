@@ -9,20 +9,18 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from '../users/entities/users.entity';
 import { PrismaService } from '../common/services/prisma.service';
 import { plainToClass } from 'class-transformer';
-import * as bcrypt from 'bcrypt';
 import { generateEmailToken } from '../common/helpers/activationCodeHelper';
-import { getHash } from '../common/helpers/cipherHelper';
+import { compare, getHash } from '../common/helpers/cipherHelper';
 import { sendEmailToken } from '../common/services/sendgrid.service';
 import { ConfirmedUserDto } from './dto/confirmed-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
-import { LogInUserDto } from './dto/login-user.dto';
 import { UserDto } from 'src/users/dto/user.dto';
 
-async function validatePassword(
+function validatePassword(
   plainTextPassword: string,
   hashedPassword: string,
-): Promise<boolean> {
-  return await bcrypt.compareSync(plainTextPassword, hashedPassword);
+): boolean {
+  return compare(plainTextPassword, hashedPassword);
 }
 
 @Injectable()
