@@ -3,13 +3,11 @@ import { ConfigType } from '@nestjs/config';
 import { PrismaService } from '../../common/services/prisma.service';
 import { config as configAWS, S3 } from 'aws-sdk';
 import attachmentConfig from '../config/attachments.config';
-import { v4 as uuid } from 'uuid';
 import { CreateAttachmentDto } from '../dto/create-attachment.dto';
 import { AttachmentDto } from '../dto/attachment.dto';
 import { AttachmentDirectoryEnum } from '../enums/attachment.enum';
 import { plainToClass } from 'class-transformer';
 import { nanoid } from 'nanoid';
-import { Attachment } from '@prisma/client';
 
 @Injectable()
 export class AttachmentsService {
@@ -65,12 +63,12 @@ export class AttachmentsService {
       input.uuid,
     );
     let extension;
-    if(type==='image/png') {
-      extension = 'png'
-    } else if (type==='image/jpg') {
-      extension = 'jpg'
+    if (type === 'image/png') {
+      extension = 'png';
+    } else if (type === 'image/jpg') {
+      extension = 'jpg';
     } else {
-      extension = 'jpeg'
+      extension = 'jpeg';
     }
     const attachment = await this.prismaService.attachment.create({
       data: {
@@ -88,7 +86,7 @@ export class AttachmentsService {
       Expires: this.configService.expirationTime,
     });
     return plainToClass(AttachmentDto, { signedUrl, ...attachment });
-  } 
+  }
 
   async getImages(bookId: number): Promise<AttachmentDto[]> {
     const attachments = await this.prismaService.attachment.findMany({
@@ -106,4 +104,5 @@ export class AttachmentsService {
       );
     }); */
   }
+  
 }

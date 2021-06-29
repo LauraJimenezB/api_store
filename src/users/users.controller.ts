@@ -45,8 +45,8 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('setAdminRole/:userId')
-  setRole(@Param('userId') userId: number) {
-    return this.usersService.setAdminRole(Number(userId));
+  @Post('setAdminRole/:userId/:roleId')
+  setRole(@Param('userId') userId: number, @Param('roleId') roleId: number) {
+    return this.usersService.setAdminRole(Number(userId), Number(roleId));
   }
 }

@@ -144,6 +144,8 @@ export class ProductsController {
   } */
 
   @Post(':id/image/upload')
+  @UseGuards(JwtAuthGuard)
+  @Roles('MANAGER')
   createAttachment(
     @Body() params: CreateAttachmentDto,
     @Request() req,
