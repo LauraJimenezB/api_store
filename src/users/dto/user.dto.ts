@@ -12,7 +12,6 @@ export class UserDto {
   emailVerified: boolean;
   @Exclude()
   hashActivation: string;
-  @Exclude()
   active: boolean;
   @Exclude()
   createdAt: string;

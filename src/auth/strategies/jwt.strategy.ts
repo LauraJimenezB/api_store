@@ -4,7 +4,11 @@ import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { AuthService } from '../../auth/auth.service';
 import { PayloadDto } from '../dto/payload.dto';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JWTPayloadType } from '../types/auth.type';
 import { plainToClass } from 'class-transformer';
 
@@ -31,6 +35,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.authService.validateAccount(payloadObj.id);
     if (!user) {
       throw new UnauthorizedException();
+    }
+    if (!user.active) {
+      throw new ForbiddenException('Log in in first');
     }
     return plainToClass(PayloadDto, payloadObj);
   }

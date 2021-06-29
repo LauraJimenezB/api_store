@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Category } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
-import { AttachmentsService } from '../attachments/services/attachments.service';
+//import { AttachmentsService } from '../attachments/services/attachments.service';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
 import { CartQuantityDto } from './dto/cart-quantity.dto';
@@ -16,10 +16,8 @@ import { ReadProductEntity } from './entities/read-product.entity';
 
 @Injectable()
 export class ProductsService {
-  constructor(
-    private prisma: PrismaService,
-    private attachmentsService: AttachmentsService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
+  //private attachmentsService: AttachmentsService,
 
   async getAll(
     paginationQueryDto: PaginationQueryDto,
@@ -352,29 +350,29 @@ export class ProductsService {
     return cartItem;
   }
 
-  async addPrivateFile(bookId: number, imageBuffer: Buffer, filename: string) {
-    return this.attachmentsService.uploadImages(imageBuffer, bookId, filename);
-  }
+  // async addPrivateFile(bookId: number, imageBuffer: Buffer, filename: string) {
+  //   return this.attachmentsService.uploadImages(imageBuffer, bookId, filename);
+  // }
 
-  async getImagesByProduct(productId: number) {
-    const productImages = await this.prisma.attachment.findMany({
-      where: {
-        bookId: productId,
-      },
-    });
-    if (productImages) {
-      return Promise.all(
-        productImages.map(async (file) => {
-          const url = await this.attachmentsService.generatePresignedUrl(
-            file.key,
-          );
-          return {
-            ...file,
-            url,
-          };
-        }),
-      );
-    }
-    throw new NotFoundException('Images with this bookId do not exist');
-  }
+  // async getImagesByProduct(productId: number) {
+  //   const productImages = await this.prisma.attachment.findMany({
+  //     where: {
+  //       bookId: productId,
+  //     },
+  //   });
+  //   if (productImages) {
+  //     return Promise.all(
+  //       productImages.map(async (file) => {
+  //         const url = await this.attachmentsService.generatePresignedUrl(
+  //           file.key,
+  //         );
+  //         return {
+  //           ...file,
+  //           url,
+  //         };
+  //       }),
+  //     );
+  //   }
+  //   throw new NotFoundException('Images with this bookId do not exist');
+  // }
 }

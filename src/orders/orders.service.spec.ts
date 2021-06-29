@@ -1,8 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { prisma } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { plainToClass } from 'class-transformer';
 import { PrismaService } from '../common/services/prisma.service';
 import { OrdersService } from './orders.service';
 
@@ -84,14 +80,15 @@ describe('UsersService', () => {
   });
 
   describe('show Order of user', () => {
-    it('should return the order after buying of a user', async () => {
-      const items = await ordersService.showOrder(1);
-      expect(items.orders).toHaveLength(2);
+    it('should return no orders', async () => {
+      await expect(ordersService.showOrder(1)).rejects.toThrow(
+        'No orders found',
+      );
     });
   });
 
   describe('show Order of user', () => {
-    it('should return the order after buying of a user', async () => {
+    it('should send the order', async () => {
       const items = await ordersService.sendOrder(1);
       expect(items.orders).toHaveLength(2);
     });
@@ -100,7 +97,6 @@ describe('UsersService', () => {
   describe('show Order of user', () => {
     it('should return the order after buying of a user', async () => {
       const items = await ordersService.showOrder(1);
-      console.log(items);
       expect(items.orders).toHaveLength(2);
     });
     it('should throw an error if the user does not exists', async () => {

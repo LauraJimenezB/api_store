@@ -1,15 +1,8 @@
-import {
-  Controller,
-  Request,
-  Post,
-  UseGuards,
-  Body,
-  Param,
-} from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Body, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
-import { LocalAuthGuard } from './guards/local-auth.guard';
+import { LogInUserDto } from './dto/login-user.dto';
 
 @ApiTags('authentication and authorization')
 @Controller('auth')
@@ -26,9 +19,8 @@ export class AuthController {
     return this.authService.confirm(emailToken);
   }
 
-  @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Request() req) {
-    return this.authService.login(req.user);
+  login(@Body() body: LogInUserDto) {
+    return this.authService.login(body.email, body.password);
   }
 }
