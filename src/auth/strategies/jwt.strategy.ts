@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { AuthService } from '../auth.service';
 import { PayloadDto } from '../dto/payload.dto';
+import jwt_decode from 'jwt-decode';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -18,13 +19,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_SECRET'),
     });
-  }
+  };
+
 
   async validate(payload: any): Promise<PayloadDto> {
     return {
       id: payload.sub,
       username: payload.username,
       roles: payload.roles,
+      active: true,
     };
   }
 }

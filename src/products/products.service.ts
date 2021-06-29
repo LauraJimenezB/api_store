@@ -5,6 +5,9 @@ import {
 } from '@nestjs/common';
 import { Category } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
+import { AttachmentDto } from 'src/attachments/dto/attachment.dto';
+import { CreateAttachmentInput } from 'src/attachments/dto/create-attachment-input.dto';
+import { ParentEnum } from 'src/attachments/enums/attachment.enum';
 import { AttachmentsService } from '../attachments/services/attachments.service';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
@@ -352,11 +355,35 @@ export class ProductsService {
     return cartItem;
   }
 
-  async addPrivateFile(bookId: number, imageBuffer: Buffer, filename: string) {
-    return this.attachmentsService.uploadImages(imageBuffer, bookId, filename);
+  async uploadImagesToBook(
+    bookId: number,
+    type: string,
+    input: CreateAttachmentInput,
+  ): Promise<AttachmentDto> {
+    const book = await this.prisma.book.findUnique({ where: { id: bookId } });
+    const attachment = await this.attachmentsService.uploadImages(
+      bookId,
+      type,
+      {
+        ...input,
+        parentType: ParentEnum.PRODUCT,
+        uuid: book.id.toString(10),
+      },
+    );
+
+    await this.prisma.book.update({
+      where: { id: book.id },
+      data: { images: { connect: { id: attachment.id } } },
+    });
+
+    return attachment;
   }
 
-  async getImagesByProduct(productId: number) {
+  /* async addPrivateFile(bookId: number, imageBuffer: Buffer, filename: string) {
+    return this.attachmentsService.uploadImages(imageBuffer, bookId, filename);
+  } */
+
+  /* async getImagesByProduct(productId: number) {
     const productImages = await this.prisma.attachment.findMany({
       where: {
         bookId: productId,
@@ -376,5 +403,5 @@ export class ProductsService {
       );
     }
     throw new NotFoundException('Images with this bookId do not exist');
-  }
+  } */
 }

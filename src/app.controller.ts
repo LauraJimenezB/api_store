@@ -27,7 +27,6 @@ export class AppController {
     return this.authService.confirm(emailToken);
   }
 
-  @UseGuards(LocalAuthGuard)
   @Post('login')
   login(@Body() body: LogInUserDto) {
     return this.authService.login(body.email, body.password);

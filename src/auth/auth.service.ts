@@ -40,10 +40,11 @@ export class AuthService {
   async login(email, password) {
     const user = await this.prisma.user.findUnique({ where: { email } });
     const validatedUser = this.validateUser(user.username, password);
-    console.log(validatedUser);
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    await this.prisma.user.update({where: { email }, data: { active: true }});
+
     const userRoles = await this.prisma.userRole.findMany({
       where: { userId: user.id },
     });
@@ -66,6 +67,7 @@ export class AuthService {
         email: user.email,
         password: hash,
         hashActivation: emailToken,
+        active: true,
       },
     });
     const getUser = await this.prisma.user.findUnique({

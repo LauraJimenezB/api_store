@@ -23,6 +23,9 @@ export class AttachmentDto implements Attachment {
   readonly contentType: ContentTypeEnum;
 
   @Expose()
+  readonly filename: string;
+
+  @Expose()
   readonly signedUrl?: string;
 
   @Expose()

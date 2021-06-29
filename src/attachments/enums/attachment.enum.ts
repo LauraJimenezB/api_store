@@ -11,11 +11,11 @@ export enum ContentTypeEnum {
 }
 
 export enum ParentEnum {
-  USER = 'USER',
+  PRODUCT = 'PRODUCT',
 }
 
 export enum AttachmentDirectoryEnum {
-  USER = 'attachments/users/{uuid}/avatars',
+  PRODUCT = 'attachments/product/{uuid}/images',
 }
 
 export type FileExtensionType = keyof typeof FileExtensionEnum;
