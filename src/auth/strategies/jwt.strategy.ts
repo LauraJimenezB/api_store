@@ -1,7 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
-import { Reflector } from '@nestjs/core';
 import { AuthService } from '../../auth/auth.service';
 import { PayloadDto } from '../dto/payload.dto';
 import {
@@ -16,7 +15,6 @@ import { plainToClass } from 'class-transformer';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly configService: ConfigService,
-    private readonly reflector: Reflector,
     private readonly authService: AuthService,
   ) {
     super({
