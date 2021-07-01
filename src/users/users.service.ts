@@ -57,12 +57,16 @@ export class UsersService {
   }
 
   async delete(id: number): Promise<UserDto> {
-    const user = this.prisma.user.delete({ where: { id } });
-
+    const user = this.prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException();
     }
-
+    await this.prisma.$executeRaw(
+      `DELETE from "UserRole" WHERE user_id=${id};`,
+    );
+    await this.prisma.user.delete({
+      where: { id },
+    });
     return plainToClass(UserDto, user);
   }
 

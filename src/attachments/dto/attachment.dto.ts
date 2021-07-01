@@ -6,14 +6,8 @@ import { ContentTypeEnum, FileExtensionEnum } from '../enums/attachment.enum';
 export class AttachmentDto implements Attachment {
   @Expose()
   readonly id: number;
-
-  @Expose()
   readonly uuid: string;
-
-  @Expose()
   readonly path: string;
-
-  @Expose()
   readonly key: string;
 
   @Expose()

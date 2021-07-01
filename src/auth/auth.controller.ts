@@ -21,12 +21,13 @@ export class AuthController {
   }
 
   @Post('login')
-  login(@Body() body: LogInUserDto) {
-    return this.authService.login(body.email, body.password);
+  login(@Body() loginUser: LogInUserDto) {
+    return this.authService.login(loginUser);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@Req() req) {
-    return this.authService.logout(req);
+    return this.authService.logout(req.user.id);
   }
 }

@@ -2,7 +2,7 @@ import sendgrid = require('@sendgrid/mail');
 import * as dotenv from 'dotenv';
 
 dotenv.config();
-sendgrid.setApiKey(process.env.API_KEY);
+sendgrid.setApiKey(process.env.API_KEY_SENDGRID);
 
 export const sendEmailToken = (email: string, emailToken: string) => {
   const msg = {

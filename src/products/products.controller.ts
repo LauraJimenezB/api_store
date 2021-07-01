@@ -19,9 +19,6 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
 import { Roles } from '../users/roles/role.decorator';
 import { AttachmentsService } from '../attachments/services/attachments.service';
-import { AttachmentDto } from '../attachments/dto/attachment.dto';
-import { UploadImageDto } from '../attachments/dto/upload-image.dto';
-import { CreateAttachmentDto } from '../attachments/dto/create-attachment.dto';
 
 @ApiTags('books')
 @Controller('products')
@@ -104,58 +101,13 @@ export class ProductsController {
     return this.productsService.addToCart(req.user.id, bookId, body);
   }
 
-  /* @Post(':id/uploadImage')
   @UseGuards(JwtAuthGuard)
   @Roles('MANAGER')
-  @UseInterceptors(FileInterceptor('file'))
-  async addPrivateFile(
-    @Param('id') bookId: number,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    console.log(file);
-    return this.productsService.addPrivateFile(
-      bookId,
-      file.buffer,
-      file.originalname,
-    );
-  } */
-  /* @Post(':id/image/upload')
-  uploadProductImage(
-    @Body() params: UploadImageDto,
-    @GetUser() user: User,
-  ): Promise<PreSignedUrlDto> {
-    return this.productsService.addPrivateFile(user.id, params);
-  }
-
-  @Get(':id/getImages')
-  @UseGuards(JwtAuthGuard)
-  async getAllPrivateFiles(@Param('id') bookId: number) {
-    return this.productsService.getImagesByProduct(bookId);
-  } */
-
-  /* @Post(':id/image/upload')
-  createAttachment(
-    @Body('type') type: string,
-    @Request() req,
-    @Param('id') bookId: number,
-  ): Promise<{ url: string }> {
-    console.log(req)
-    return this.attachmentsService.uploadImages(type, bookId);
-  } */
-
   @Post(':id/image/upload')
-  @UseGuards(JwtAuthGuard)
-  @Roles('MANAGER')
-  createAttachment(
-    @Body() params: CreateAttachmentDto,
-    @Request() req,
-    @Param('id') bookId: number,
-  ): Promise<AttachmentDto> {
-    return this.productsService.uploadImagesToBook(bookId, req.headers['content-type'], params);
-  }
-
-  @Get('images/:id')
-  getAttachments(@Param('id') bookId: number): Promise<AttachmentDto[]> {
-    return this.attachmentsService.getImages(bookId);
+  createAttachment(@Request() req, @Param('id') bookId: number) {
+    return this.productsService.uploadImagesToBook(
+      bookId,
+      req.headers['content-type'],
+    );
   }
 }

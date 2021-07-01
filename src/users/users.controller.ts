@@ -34,19 +34,19 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
-    return this.usersService.update(Number(id), body);
+  updateUser(@Param('id') id: number, @Body() body: UpdateUserDto) {
+    return this.usersService.update(id, body);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.delete(Number(id));
+  remove(@Param('id') id: number) {
+    return this.usersService.delete(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('setAdminRole/:userId/:roleId')
   setRole(@Param('userId') userId: number, @Param('roleId') roleId: number) {
-    return this.usersService.setAdminRole(Number(userId), Number(roleId));
+    return this.usersService.setAdminRole(userId, roleId);
   }
 }
