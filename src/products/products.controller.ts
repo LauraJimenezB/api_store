@@ -79,7 +79,6 @@ export class ProductsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Roles('MANAGER')
   @Post(':id/like')
   likeBook(@Request() req, @Param('id') bookId: number) {
     return this.productsService.like(req.user.id, bookId);
