@@ -374,26 +374,4 @@ export class ProductsService {
     });
     return attachment;
   }
-
-  /* async getImagesByProduct(productId: number) {
-    const productImages = await this.prisma.attachment.findMany({
-      where: {
-        bookId: productId,
-      },
-    });
-    if (productImages) {
-      return Promise.all(
-        productImages.map(async (file) => {
-          const url = await this.attachmentsService.generatePresignedUrl(
-            file.key,
-          );
-          return {
-            ...file,
-            url,
-          };
-        }),
-      );
-    }
-    throw new NotFoundException('Images with this bookId do not exist');
-  } */
 }
