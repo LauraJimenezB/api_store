@@ -105,4 +105,9 @@ export class UsersService {
     userWithRole.roles = roles;
     return userWithRole;
   }
+
+  async fillRoles() {
+    await this.prisma.role.create({ data: { name: 'CLIENT' } });
+    await this.prisma.role.create({ data: { name: 'MANAGER' } });
+  }
 }

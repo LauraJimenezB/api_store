@@ -49,4 +49,9 @@ export class UsersController {
   setRole(@Param('userId') userId: number, @Param('roleId') roleId: number) {
     return this.usersService.setAdminRole(userId, roleId);
   }
+
+  @Post('fillRoles')
+  fillRoles() {
+    return this.usersService.fillRoles();
+  }
 }

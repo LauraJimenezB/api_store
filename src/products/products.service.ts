@@ -27,9 +27,6 @@ export class ProductsService {
     paginationQueryDto: PaginationQueryDto,
   ): Promise<ReadProductDto[]> {
     const { limit, offset } = paginationQueryDto;
-
-    await this.prisma.role.create({ data: { name: 'CLIENT' } });
-    await this.prisma.role.create({ data: { name: 'MANAGER' } });
     const categories = await this.prisma.category.findMany();
     const books = await this.prisma.book.findMany({
       skip: offset,
