@@ -92,7 +92,7 @@ export class AuthService {
     return { message: 'User has logged out' };
   }
 
-  async signup(user: CreateUserDto): Promise<VerifyEmailDto> {
+  async signup(user: CreateUserDto): Promise<void> {
     let userFound = await this.prisma.user.findUnique({
       where: { username: user.username },
     });
@@ -127,7 +127,6 @@ export class AuthService {
       },
     });
     sendEmailToken(createdUser.email, createdUser.hashActivation);
-    return { status: 201, message: 'Verify your email' };
   }
 
   async confirm(emailToken: string): Promise<ConfirmedUserDto> {
