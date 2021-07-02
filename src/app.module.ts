@@ -6,7 +6,7 @@ import { ProductsModule } from './products/products.module';
 import { CommonModule } from './common/common.module';
 import { OrdersModule } from './orders/orders.module';
 import { APP_GUARD } from '@nestjs/core';
-import { RoleGuard } from './users/roles/guard/roles.guard'
+import { RoleGuard } from './users/roles/guard/roles.guard';
 
 @Module({
   imports: [
@@ -18,10 +18,10 @@ import { RoleGuard } from './users/roles/guard/roles.guard'
     OrdersModule,
   ],
   providers: [
-  {
-    provide: APP_GUARD,
-    useClass: RoleGuard,
-  },
-],
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
+    },
+  ],
 })
 export class AppModule {}

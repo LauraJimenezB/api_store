@@ -11,7 +11,6 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Roles } from './roles/role.decorator';
 import { UsersService } from './users.service';
 
 @ApiTags('Users')
@@ -21,7 +20,6 @@ export class UsersController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  //@Roles('MANAGER')
   async getAllUsers() {
     return await this.usersService.getAllUsers();
   }

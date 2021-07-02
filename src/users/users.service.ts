@@ -9,14 +9,7 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async getAllUsers(): Promise<UserDto[]> {
-    const users = await this.prisma.user.findMany({
-      select: {
-        email: true,
-        username: true,
-        fullName: true,
-        password: true,
-      },
-    });
+    const users = await this.prisma.user.findMany({});
     return plainToClass(UserDto, users);
   }
 

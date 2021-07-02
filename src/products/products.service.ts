@@ -134,6 +134,9 @@ export class ProductsService {
     if (!book) {
       throw new NotFoundException();
     }
+    await this.prisma.$executeRaw(
+      `DELETE from "Attachment" WHERE "bookId"=${id};`,
+    );
     await this.prisma.book.delete({
       where: {
         id: id,
