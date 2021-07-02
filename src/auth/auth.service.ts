@@ -13,7 +13,6 @@ import { generateEmailToken } from '../common/helpers/activationCodeHelper';
 import { compare, getHash } from '../common/helpers/cipherHelper';
 import { sendEmailToken } from '../common/services/sendgrid.service';
 import { ConfirmedUserDto } from './dto/confirmed-user.dto';
-import { VerifyEmailDto } from './dto/verify-email.dto';
 import { UserDto } from 'src/users/dto/user.dto';
 import { UnauthorizedException } from '@nestjs/common';
 import { LogInUserDto } from './dto/login-user.dto';
@@ -89,7 +88,6 @@ export class AuthService {
         active: false,
       },
     });
-    return { message: 'User has logged out' };
   }
 
   async signup(user: CreateUserDto): Promise<void> {

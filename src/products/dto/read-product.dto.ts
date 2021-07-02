@@ -1,3 +1,4 @@
+import { ApiHideProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 
 export class ReadProductDto {
@@ -9,8 +10,9 @@ export class ReadProductDto {
   categoryName: string;
   disabled: boolean;
   favourites: number;
-  @Exclude()
   categoryId: number;
+
+  @ApiHideProperty()
   @Exclude()
   category;
 }
