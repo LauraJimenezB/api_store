@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   Param,
   Patch,
   Post,
@@ -10,7 +11,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { CartQuantityDto } from './dto/cart-quantity.dto';
@@ -109,6 +110,10 @@ export class ProductsController {
   }
 
   @ApiBearerAuth('access-token')
+  @ApiHeader({
+    name: 'Content-Type',
+    description: 'Fill image/jpeg',
+  })
   @UseGuards(JwtAuthGuard)
   @Roles('MANAGER')
   @Post(':id/image/upload')

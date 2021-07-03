@@ -366,7 +366,10 @@ export class ProductsService {
     if (!book) {
       throw new NotFoundException();
     }
-    const attachment = await this.attachmentsService.uploadImages(bookId, type);
+    const attachment = await this.attachmentsService.uploadImages(
+      bookId,
+      !type ? 'image/jpeg' : type,
+    );
     if (!attachment) {
       throw new NotFoundException();
     }
