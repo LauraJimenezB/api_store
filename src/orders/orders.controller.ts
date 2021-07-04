@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Get,
   Param,
@@ -7,9 +6,8 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/users/roles/role.decorator';
-
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { OrdersService } from './orders.service';
 
@@ -18,26 +16,22 @@ import { OrdersService } from './orders.service';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
   @Get('mycart')
   showCart(@Request() req) {
     return this.ordersService.showCart(req.user.id);
   }
 
-  /* @UseGuards(JwtAuthGuard)
-  @Get()
-  showOrder(@Request() req) {
-    return this.ordersService.showOrder(req.user.id);
-  } */
-
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
   @Roles('MANAGER')
   @Get(':id')
-  //for manager
   showOrderOfUser(@Request() req, @Param('id') userId: number) {
     return this.ordersService.showOrder(userId);
   }
 
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
   @Post('buy')
   sendOrder(@Request() req) {

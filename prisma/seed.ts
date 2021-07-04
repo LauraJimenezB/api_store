@@ -22,47 +22,10 @@ const users = [
         emailVerified: true,
         hashActivation: 'caracteresaleatorios2',
     },
-    {
-        email: 'julio@store.com',
-        username: 'jalvarez',
-        fullName: 'Julio Alvarez',
-        password: 'contrasena123',
-        emailVerified: true,
-        hashActivation: 'caracteresaleatorios3',
-    },
-    {
-        email: 'laura@store.com',
-        username: 'laura',
-        fullName: 'Laura Jimenez',
-        password: 'contrasena456',
-        emailVerified: true,
-        hashActivation: 'caracteresaleatorios4',
-    },
-    {
-        email: 'edith@store.com',
-        username: 'edith',
-        fullName: 'Edith Rivero',
-        password: 'contrasena456',
-        emailVerified: true,
-        hashActivation: 'caracteresaleatorios5',
-    },
-    {
-        email: 'super@store.com',
-        username: 'super',
-        fullName: 'Super Man',
-        password: 'contrasena456',
-        emailVerified: true,
-        hashActivation: 'caracteresaleatorios6',
-    }
 ];
 const userRoles = [
     { userId: 1, roleId: 1 },
-    { userId: 2, roleId: 1 },
-    { userId: 3, roleId: 1 },
-    { userId: 4, roleId: 2 },
-    { userId: 5, roleId: 2 },
-    { userId: 6, roleId: 1 },
-    { userId: 6, roleId: 2 }
+    { userId: 2, roleId: 2 },
 ]
 
 const categories = [

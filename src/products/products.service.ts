@@ -6,8 +6,6 @@ import {
 import { Category } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
 import { AttachmentDto } from 'src/attachments/dto/attachment.dto';
-import { CreateAttachmentInput } from '../attachments/dto/create-attachment-input.dto';
-import { ParentEnum } from 'src/attachments/enums/attachment.enum';
 import { AttachmentsService } from '../attachments/services/attachments.service';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
@@ -15,18 +13,20 @@ import { CartQuantityDto } from './dto/cart-quantity.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ShowCartItemDto } from './dto/showcart-item.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ReadProductEntity } from './entities/read-product.entity';
+import { ReadProductDto } from './dto/read-product.dto';
+import { ReadProductImagesDto } from './dto/read-product-images.dto';
 
 @Injectable()
 export class ProductsService {
-  constructor(private prisma: PrismaService, private attachmentsService: AttachmentsService) {}
-  //private attachmentsService: AttachmentsService,
+  constructor(
+    private prisma: PrismaService,
+    private attachmentsService: AttachmentsService,
+  ) {}
 
   async getAll(
     paginationQueryDto: PaginationQueryDto,
-  ): Promise<ReadProductEntity[]> {
+  ): Promise<ReadProductDto[]> {
     const { limit, offset } = paginationQueryDto;
-
     const categories = await this.prisma.category.findMany();
     const books = await this.prisma.book.findMany({
       skip: offset,
@@ -46,10 +46,10 @@ export class ProductsService {
           .name,
       };
     });
-    return plainToClass(ReadProductEntity, prods);
+    return plainToClass(ReadProductDto, prods);
   }
 
-  async get(id: number): Promise<ReadProductEntity> {
+  async get(id: number): Promise<ReadProductDto> {
     const book = await this.prisma.book.findUnique({
       where: { id: id },
       include: {
@@ -59,13 +59,15 @@ export class ProductsService {
     if (!book) {
       throw new NotFoundException();
     }
-    const product = plainToClass(ReadProductEntity, book);
+    const imagesUrl = await this.attachmentsService.getImages(id);
+    const product = plainToClass(ReadProductImagesDto, book);
     product.favourites = book.favourites.length;
     product.categoryName = book.category.name;
+    product.imagesUrl = imagesUrl;
     return product;
   }
 
-  async create(createDto: CreateProductDto): Promise<ReadProductEntity> {
+  async create(createDto: CreateProductDto): Promise<ReadProductDto> {
     const category = await this.preloadCategoryByName(
       createDto.category.toLowerCase(),
     );
@@ -82,7 +84,7 @@ export class ProductsService {
         category: true,
       },
     });
-    const product = plainToClass(ReadProductEntity, book);
+    const product = plainToClass(ReadProductDto, book);
     product.favourites = book.favourites.length;
     product.categoryName = book.category.name;
     return product;
@@ -91,7 +93,7 @@ export class ProductsService {
   async update(
     id: number,
     updateDto: UpdateProductDto,
-  ): Promise<ReadProductEntity> {
+  ): Promise<ReadProductDto> {
     const book = await this.prisma.book.findUnique({
       where: { id: id },
       include: { category: true },
@@ -119,28 +121,31 @@ export class ProductsService {
         category: true,
       },
     });
-    const product = plainToClass(ReadProductEntity, updatedBook);
+    const product = plainToClass(ReadProductDto, updatedBook);
     product.favourites = updatedBook.favourites.length;
     product.categoryName = updatedBook.category.name;
     return product;
   }
 
-  async delete(id: number): Promise<ReadProductEntity> {
+  async delete(id: number): Promise<ReadProductDto> {
     const book = await this.prisma.book.findUnique({
       where: { id: id },
     });
     if (!book) {
       throw new NotFoundException();
     }
+    await this.prisma.$executeRaw(
+      `DELETE from "Attachment" WHERE "bookId"=${id};`,
+    );
     await this.prisma.book.delete({
       where: {
         id: id,
       },
     });
-    return plainToClass(ReadProductEntity, book);
+    return plainToClass(ReadProductDto, book);
   }
 
-  async getByCategory(name: string): Promise<ReadProductEntity[]> {
+  async getByCategory(name: string): Promise<ReadProductDto[]> {
     const category = await this.prisma.category.findFirst({
       where: { name: name.toLowerCase() },
     });
@@ -160,10 +165,10 @@ export class ProductsService {
       };
       return prodToReturn;
     });
-    return plainToClass(ReadProductEntity, prods);
+    return plainToClass(ReadProductDto, prods);
   }
 
-  async disable(id: number): Promise<ReadProductEntity> {
+  async disable(id: number): Promise<ReadProductDto> {
     const book = await this.prisma.book.findUnique({
       where: { id: id },
     });
@@ -179,13 +184,13 @@ export class ProductsService {
       },
       include: { category: true },
     });
-    const product = plainToClass(ReadProductEntity, updatedBook);
+    const product = plainToClass(ReadProductDto, updatedBook);
     product.favourites = updatedBook.favourites.length;
     product.categoryName = updatedBook.category.name;
     return product;
   }
 
-  async enable(id: number): Promise<ReadProductEntity> {
+  async enable(id: number): Promise<ReadProductDto> {
     const book = await this.prisma.book.findUnique({
       where: { id: id },
     });
@@ -201,7 +206,7 @@ export class ProductsService {
       },
       include: { category: true },
     });
-    const product = plainToClass(ReadProductEntity, updatedBook);
+    const product = plainToClass(ReadProductDto, updatedBook);
     product.favourites = updatedBook.favourites.length;
     product.categoryName = updatedBook.category.name;
     return product;
@@ -234,7 +239,7 @@ export class ProductsService {
     const alreadyLiked = book.favourites.includes(Number(userId));
 
     if (alreadyLiked) {
-      const product = plainToClass(ReadProductEntity, book);
+      const product = plainToClass(ReadProductDto, book);
       product.favourites = book.favourites.length;
       product.categoryName = book.category.name;
       return product;
@@ -252,7 +257,7 @@ export class ProductsService {
         category: true,
       },
     });
-    const prodUpdated = plainToClass(ReadProductEntity, updatedBook);
+    const prodUpdated = plainToClass(ReadProductDto, updatedBook);
     prodUpdated.favourites = updatedBook.favourites.length;
     prodUpdated.categoryName = updatedBook.category.name;
     return prodUpdated;
@@ -288,12 +293,12 @@ export class ProductsService {
           category: true,
         },
       });
-      const product = plainToClass(ReadProductEntity, updatedBook);
+      const product = plainToClass(ReadProductDto, updatedBook);
       product.favourites = updatedBook.favourites.length;
       product.categoryName = updatedBook.category.name;
       return product;
     }
-    const product = plainToClass(ReadProductEntity, book);
+    const product = plainToClass(ReadProductDto, book);
     product.favourites = book.favourites.length;
     product.categoryName = book.category.name;
     return product;
@@ -356,46 +361,22 @@ export class ProductsService {
   async uploadImagesToBook(
     bookId: number,
     type: string,
-    input: CreateAttachmentInput,
   ): Promise<AttachmentDto> {
     const book = await this.prisma.book.findUnique({ where: { id: bookId } });
+    if (!book) {
+      throw new NotFoundException();
+    }
     const attachment = await this.attachmentsService.uploadImages(
       bookId,
-      type,
-      {
-        ...input,
-        parentType: ParentEnum.PRODUCT,
-        uuid: book.id.toString(10),
-      },
+      !type ? 'image/jpeg' : type,
     );
-
+    if (!attachment) {
+      throw new NotFoundException();
+    }
     await this.prisma.book.update({
       where: { id: book.id },
       data: { images: { connect: { id: attachment.id } } },
     });
-
     return attachment;
   }
-
-  /* async getImagesByProduct(productId: number) {
-    const productImages = await this.prisma.attachment.findMany({
-      where: {
-        bookId: productId,
-      },
-    });
-    if (productImages) {
-      return Promise.all(
-        productImages.map(async (file) => {
-          const url = await this.attachmentsService.generatePresignedUrl(
-            file.key,
-          );
-          return {
-            ...file,
-            url,
-          };
-        }),
-      );
-    }
-    throw new NotFoundException('Images with this bookId do not exist');
-  } */
 }

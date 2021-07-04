@@ -50,18 +50,10 @@ model Book {
   disabled   Boolean      @default(false)
   favourites Int[]
   categoryId Int          @map(name: "category_id")
-  bookimages BookImages[]
-  images Attachment[]
+  images     Attachment[]
   cart       Cart[]
   bookSale   BookSale[]
   category   Category     @relation(fields: [categoryId], references: [id])
-}
-
-model BookImages {
-  id     Int    @id @default(autoincrement())
-  bookId Int    @map(name: "book_id")
-  key String
-  book   Book   @relation(fields: [bookId], references: [id])
 }
 
 model Category {
@@ -100,11 +92,10 @@ model BookSale {
 
 model Attachment {
   id          Int      @id @default(autoincrement())
+  bookId      Int
   key         String
-  bookId Int
-  book    Book[]  @relation(fields: [bookId], references: [id])
   createdAt   DateTime @default(now()) @map(name: "created_at")
   contentType String
-  ext String
-  path String
+  ext         String
+  book        Book[]   @relation(fields: [bookId], references: [id])
 }
