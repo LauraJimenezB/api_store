@@ -1,3 +1,4 @@
+import { ApiHideProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 
 export class ConfirmedUserDto {
@@ -5,19 +6,31 @@ export class ConfirmedUserDto {
   username: string;
   email: string;
   fullname: string;
+
+  @ApiHideProperty()
   roles: string[];
-  @Exclude()
-  fullName: string;
+
+  @ApiHideProperty()
   @Exclude()
   password: string;
+
+  @ApiHideProperty()
   @Exclude()
   emailVerified: boolean;
+
+  @ApiHideProperty()
   @Exclude()
   hashActivation: string;
+
+  @ApiHideProperty()
   @Exclude()
   active: boolean;
+
+  @ApiHideProperty()
   @Exclude()
   createdAt: string;
+
+  @ApiHideProperty()
   @Exclude()
   confirmedAt: string;
 }
