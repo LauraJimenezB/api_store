@@ -9,14 +9,7 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async getAllUsers(): Promise<UserDto[]> {
-    const users = await this.prisma.user.findMany({
-      select: {
-        email: true,
-        username: true,
-        fullName: true,
-        password: true,
-      },
-    });
+    const users = await this.prisma.user.findMany({});
     return plainToClass(UserDto, users);
   }
 
@@ -57,12 +50,16 @@ export class UsersService {
   }
 
   async delete(id: number): Promise<UserDto> {
-    const user = this.prisma.user.delete({ where: { id } });
-
+    const user = this.prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException();
     }
-
+    await this.prisma.$executeRaw(
+      `DELETE from "UserRole" WHERE user_id=${id};`,
+    );
+    await this.prisma.user.delete({
+      where: { id },
+    });
     return plainToClass(UserDto, user);
   }
 
@@ -100,5 +97,10 @@ export class UsersService {
     );
     userWithRole.roles = roles;
     return userWithRole;
+  }
+
+  async fillRoles() {
+    await this.prisma.role.create({ data: { name: 'CLIENT' } });
+    await this.prisma.role.create({ data: { name: 'MANAGER' } });
   }
 }

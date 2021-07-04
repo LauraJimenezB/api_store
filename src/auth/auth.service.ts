@@ -13,10 +13,9 @@ import { generateEmailToken } from '../common/helpers/activationCodeHelper';
 import { compare, getHash } from '../common/helpers/cipherHelper';
 import { sendEmailToken } from '../common/services/sendgrid.service';
 import { ConfirmedUserDto } from './dto/confirmed-user.dto';
-import { VerifyEmailDto } from './dto/verify-email.dto';
-import { UserDto } from '../users/dto/user.dto';
-import jwt_decode from 'jwt-decode';
-import { DecodedDto } from '../users/dto/decoded.dto';
+import { UserDto } from 'src/users/dto/user.dto';
+import { UnauthorizedException } from '@nestjs/common';
+import { LogInUserDto } from './dto/login-user.dto';
 
 function validatePassword(
   plainTextPassword: string,
@@ -33,9 +32,10 @@ export class AuthService {
     private prisma: PrismaService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
+  async validateUser(username: string, password: string): Promise<User> {
     const user = await this.usersService.getByUsername(username);
     const validPassword = validatePassword(password, user.password);
+    console.log(validPassword);
     if (user && validPassword) {
       return user;
     }
@@ -46,14 +46,19 @@ export class AuthService {
     return await this.usersService.get(id);
   }
 
-  async login(email, password) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    const validatedUser = this.validateUser(user.username, password);
+  async login(loginUser: LogInUserDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: loginUser.email },
+    });
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    const validPassword = validatePassword(loginUser.password, user.password);
+    if (!validPassword) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
     await this.prisma.user.update({
-      where: { email },
+      where: { email: loginUser.email },
       data: {
         active: true,
       },
@@ -70,18 +75,22 @@ export class AuthService {
     };
   }
 
-  async logout(req) {
-    const decoded: DecodedDto = jwt_decode(req.header('Authorization'));
+  async logout(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     await this.prisma.user.update({
-      where: { id: decoded.sub },
+      where: { id },
       data: {
         active: false,
       },
     });
-    return { message: 'User has logged out' };
   }
 
-  async signup(user: CreateUserDto): Promise<VerifyEmailDto> {
+  async signup(user: CreateUserDto): Promise<void> {
     let userFound = await this.prisma.user.findUnique({
       where: { username: user.username },
     });
@@ -116,7 +125,6 @@ export class AuthService {
       },
     });
     sendEmailToken(createdUser.email, createdUser.hashActivation);
-    return { status: 201, message: 'Verify your email' };
   }
 
   async confirm(emailToken: string): Promise<ConfirmedUserDto> {
