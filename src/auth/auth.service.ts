@@ -14,9 +14,9 @@ import { compare, getHash } from '../common/helpers/cipherHelper';
 import { sendEmailToken } from '../common/services/sendgrid.service';
 import { ConfirmedUserDto } from './dto/confirmed-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
-import { UserDto } from 'src/users/dto/user.dto';
+import { UserDto } from '../users/dto/user.dto';
 import jwt_decode from 'jwt-decode';
-import { DecodedDto } from 'src/users/dto/decoded.dto';
+import { DecodedDto } from '../users/dto/decoded.dto';
 
 function validatePassword(
   plainTextPassword: string,
@@ -78,7 +78,7 @@ export class AuthService {
         active: false,
       },
     });
-    return {message: 'User has logged out'}
+    return { message: 'User has logged out' };
   }
 
   async signup(user: CreateUserDto): Promise<VerifyEmailDto> {

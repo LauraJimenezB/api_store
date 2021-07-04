@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { CartQuantityDto } from './dto/cart-quantity.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -145,13 +145,16 @@ export class ProductsController {
 
   @Post(':id/image/upload')
   @UseGuards(JwtAuthGuard)
-  @Roles('MANAGER')
   createAttachment(
     @Body() params: CreateAttachmentDto,
     @Request() req,
     @Param('id') bookId: number,
   ): Promise<AttachmentDto> {
-    return this.productsService.uploadImagesToBook(bookId, req.headers['content-type'], params);
+    return this.productsService.uploadImagesToBook(
+      bookId,
+      req.headers['content-type'],
+      params,
+    );
   }
 
   @Get('images/:id')

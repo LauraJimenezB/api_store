@@ -80,14 +80,14 @@ describe('UsersService', () => {
   });
 
   describe('set role to user', () => {
-    /* it('should return a user', async () => {
-      const user = await userService.setAdminRole(1);
+    it('should return a user', async () => {
+      const user = await userService.setAdminRole(1, 2);
       console.log(user);
       expect(user.username).toBe('Ana1246');
       expect(user.roles).toContain('Manager');
-    }); */
+    });
     it('should throw an error when user does not exists in the database', async () => {
-      await expect(userService.setAdminRole(6)).rejects.toThrow(
+      await expect(userService.setAdminRole(6, 2)).rejects.toThrow(
         'User not found',
       );
     });

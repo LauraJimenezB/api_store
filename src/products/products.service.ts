@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { Category } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
-import { AttachmentDto } from 'src/attachments/dto/attachment.dto';
+import { AttachmentDto } from '../attachments/dto/attachment.dto';
 import { CreateAttachmentInput } from '../attachments/dto/create-attachment-input.dto';
-import { ParentEnum } from 'src/attachments/enums/attachment.enum';
+import { ParentEnum } from '../attachments/enums/attachment.enum';
 import { AttachmentsService } from '../attachments/services/attachments.service';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';
@@ -19,7 +19,10 @@ import { ReadProductEntity } from './entities/read-product.entity';
 
 @Injectable()
 export class ProductsService {
-  constructor(private prisma: PrismaService, private attachmentsService: AttachmentsService) {}
+  constructor(
+    private prisma: PrismaService,
+    private attachmentsService: AttachmentsService,
+  ) {}
   //private attachmentsService: AttachmentsService,
 
   async getAll(
