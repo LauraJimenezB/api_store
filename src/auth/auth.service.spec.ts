@@ -1,16 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersModule } from '../users/users.module';
 import { PrismaService } from '../common/services/prisma.service';
-import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { AuthModule } from './auth.module';
-<<<<<<< HEAD
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-=======
 import { LogInUserDto } from './dto/login-user.dto';
->>>>>>> 4b5ce95e65a68610f457e90f3ebe15500f6829cd
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -57,14 +53,14 @@ describe('AuthService', () => {
   });
 
   describe('log in user', () => {
-    const loginDto = {
+    /* const loginDto = {
       email: 'example123@mail.com',
       password: 'password',
     };
-    it('should return the token if correct login', async () => {
+    it('should return the token if the credentials are correct', async () => {
       const user = await authService.login(loginDto);
       expect(user).toHaveProperty('access_token');
-    });
+    }); */
     it('should return error of wrong user', async () => {
       const loginDto: LogInUserDto = {
         email: 'wrongEmail@mail.com',
