@@ -20,5 +20,5 @@ export class UpdateUserDto {
   @ApiProperty({ description: 'First name and last name of user.' })
   @IsString()
   @IsOptional()
-  fullname: string;
+  fullName: string;
 }

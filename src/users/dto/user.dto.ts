@@ -4,7 +4,7 @@ export class UserDto {
   id: number;
   username: string;
   email: string;
-  fullname: string;
+  fullName: string;
   roles: string[];
   @Exclude()
   password: string;

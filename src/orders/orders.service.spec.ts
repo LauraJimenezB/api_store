@@ -18,7 +18,7 @@ describe('UsersService', () => {
 
     await prismaService.user.create({
       data: {
-        id: 1,
+        //id: 1,
         username: 'anaC',
         fullName: 'Ana Castillo',
         email: 'example123@mail.com',
