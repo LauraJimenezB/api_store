@@ -46,19 +46,19 @@ export class AuthService {
     return await this.usersService.get(id);
   }
 
-  async login(userEmail, userPassword) {
+  async login(loginUser) {
     const user = await this.prisma.user.findUnique({
-      where: { email: userEmail },
+      where: { email: loginUser.email },
     });
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const validPassword = validatePassword(userPassword, user.password);
+    const validPassword = validatePassword(loginUser.password, user.password);
     if (!validPassword) {
       throw new UnauthorizedException('Invalid credentials');
     }
     await this.prisma.user.update({
-      where: { email: userEmail },
+      where: { email: loginUser.email },
       data: {
         active: true,
       },

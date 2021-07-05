@@ -4,9 +4,13 @@ import { PrismaService } from '../common/services/prisma.service';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { AuthModule } from './auth.module';
+<<<<<<< HEAD
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+=======
+import { LogInUserDto } from './dto/login-user.dto';
+>>>>>>> 4b5ce95e65a68610f457e90f3ebe15500f6829cd
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -53,19 +57,31 @@ describe('AuthService', () => {
   });
 
   describe('log in user', () => {
-    /* it('should return the order after buying of a user', async () => {
-      const user = await authService.login('example123@mail.com', 'password');
+    const loginDto = {
+      email: 'example123@mail.com',
+      password: 'password',
+    };
+    it('should return the token if correct login', async () => {
+      const user = await authService.login(loginDto);
       expect(user).toHaveProperty('access_token');
-    }); */
-    it('should return the order after buying of a user', async () => {
-      await expect(
-        authService.login('wrongEmail@mail.com', 'wrongPassword'),
-      ).rejects.toThrow('User not found');
     });
-    it('should return the order after buying of a user', async () => {
-      await expect(
-        authService.login('example123@mail.com', 'wrongPassword'),
-      ).rejects.toThrow('Invalid credentials');
+    it('should return error of wrong user', async () => {
+      const loginDto: LogInUserDto = {
+        email: 'wrongEmail@mail.com',
+        password: 'password',
+      };
+      await expect(authService.login(loginDto)).rejects.toThrow(
+        'User not found',
+      );
+    });
+    it('should return error of wrong password', async () => {
+      const loginDto: LogInUserDto = {
+        email: 'example123@mail.com',
+        password: 'wrongPassword',
+      };
+      await expect(authService.login(loginDto)).rejects.toThrow(
+        'Invalid credentials',
+      );
     });
   });
 
