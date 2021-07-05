@@ -15,6 +15,7 @@ import { ShowCartItemDto } from './dto/showcart-item.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ReadProductDto } from './dto/read-product.dto';
 import { ReadProductImagesDto } from './dto/read-product-images.dto';
+import { ContentTypeDto } from './dto/content-type.dto';
 
 @Injectable()
 export class ProductsService {
@@ -360,7 +361,7 @@ export class ProductsService {
 
   async uploadImagesToBook(
     bookId: number,
-    type: string,
+    content: ContentTypeDto,
   ): Promise<AttachmentDto> {
     const book = await this.prisma.book.findUnique({ where: { id: bookId } });
     if (!book) {
@@ -368,7 +369,7 @@ export class ProductsService {
     }
     const attachment = await this.attachmentsService.uploadImages(
       bookId,
-      !type ? 'image/jpeg' : type,
+      content.contentType,
     );
     if (!attachment) {
       throw new NotFoundException();

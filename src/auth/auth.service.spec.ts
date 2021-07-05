@@ -4,6 +4,7 @@ import { PrismaService } from '../common/services/prisma.service';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { AuthModule } from './auth.module';
+import { LogInUserDto } from './dto/login-user.dto';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -35,9 +36,31 @@ describe('AuthService', () => {
   });
 
   describe('log in user', () => {
-    it('should return the order after buying of a user', async () => {
-      const user = await authService.login('example123@mail.com', 'pass123');
-      console.log(user);
+    const loginDto = {
+      email: 'example123@mail.com',
+      password: 'password',
+    };
+    it('should return the token if correct login', async () => {
+      const user = await authService.login(loginDto);
+      expect(user).toHaveProperty('access_token');
+    });
+    it('should return error of wrong user', async () => {
+      const loginDto: LogInUserDto = {
+        email: 'wrongEmail@mail.com',
+        password: 'password',
+      };
+      await expect(authService.login(loginDto)).rejects.toThrow(
+        'User not found',
+      );
+    });
+    it('should return error of wrong password', async () => {
+      const loginDto: LogInUserDto = {
+        email: 'example123@mail.com',
+        password: 'wrongPassword',
+      };
+      await expect(authService.login(loginDto)).rejects.toThrow(
+        'Invalid credentials',
+      );
     });
   });
 

@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Header,
   Param,
   Patch,
   Post,
@@ -11,7 +10,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { CartQuantityDto } from './dto/cart-quantity.dto';
@@ -20,6 +19,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
 import { Roles } from '../users/roles/role.decorator';
 import { AttachmentsService } from '../attachments/services/attachments.service';
+import { ContentTypeDto } from './dto/content-type.dto';
 
 @ApiTags('books')
 @Controller('products')
@@ -110,17 +110,13 @@ export class ProductsController {
   }
 
   @ApiBearerAuth('access-token')
-  @ApiHeader({
-    name: 'Content-Type',
-    description: 'Fill image/jpeg',
-  })
   @UseGuards(JwtAuthGuard)
   @Roles('MANAGER')
   @Post(':id/image/upload')
-  createAttachment(@Request() req, @Param('id') bookId: number) {
-    return this.productsService.uploadImagesToBook(
-      bookId,
-      req.headers['content-type'],
-    );
+  createAttachment(
+    @Param('id') bookId: number,
+    @Body() contentType: ContentTypeDto,
+  ) {
+    return this.productsService.uploadImagesToBook(bookId, contentType);
   }
 }
