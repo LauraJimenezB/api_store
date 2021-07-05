@@ -1,4 +1,6 @@
 import {
+  forwardRef,
+  Inject,
   Injectable,
   NotAcceptableException,
   NotFoundException,
@@ -13,9 +15,8 @@ import { generateEmailToken } from '../common/helpers/activationCodeHelper';
 import { compare, getHash } from '../common/helpers/cipherHelper';
 import { sendEmailToken } from '../common/services/sendgrid.service';
 import { ConfirmedUserDto } from './dto/confirmed-user.dto';
-import { UserDto } from 'src/users/dto/user.dto';
+import { UserDto } from '../users/dto/user.dto';
 import { UnauthorizedException } from '@nestjs/common';
-import { LogInUserDto } from './dto/login-user.dto';
 
 function validatePassword(
   plainTextPassword: string,
@@ -35,7 +36,6 @@ export class AuthService {
   async validateUser(username: string, password: string): Promise<User> {
     const user = await this.usersService.getByUsername(username);
     const validPassword = validatePassword(password, user.password);
-    console.log(validPassword);
     if (user && validPassword) {
       return user;
     }
@@ -46,19 +46,19 @@ export class AuthService {
     return await this.usersService.get(id);
   }
 
-  async login(loginUser: LogInUserDto) {
+  async login(userEmail, userPassword) {
     const user = await this.prisma.user.findUnique({
-      where: { email: loginUser.email },
+      where: { email: userEmail },
     });
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const validPassword = validatePassword(loginUser.password, user.password);
+    const validPassword = validatePassword(userPassword, user.password);
     if (!validPassword) {
       throw new UnauthorizedException('Invalid credentials');
     }
     await this.prisma.user.update({
-      where: { email: loginUser.email },
+      where: { email: userEmail },
       data: {
         active: true,
       },
@@ -108,7 +108,7 @@ export class AuthService {
     const createdUser = await this.prisma.user.create({
       data: {
         username: user.username,
-        fullName: user.fullname,
+        fullName: user.fullName,
         email: user.email,
         password: hash,
         hashActivation: emailToken,

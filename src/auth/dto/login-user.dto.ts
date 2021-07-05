@@ -25,15 +25,11 @@ export class LogInUserDto {
   @ApiHideProperty()
   @IsOptional()
   @IsString()
-  fullname: string;
+  fullName: string;
 
   @ApiHideProperty()
   @IsOptional()
   roles: string[];
-
-  @ApiHideProperty()
-  @Exclude()
-  fullName: string;
 
   @ApiHideProperty()
   @Exclude()

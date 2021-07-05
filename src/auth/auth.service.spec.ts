@@ -5,6 +5,8 @@ import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { AuthModule } from './auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -12,8 +14,23 @@ describe('AuthService', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [UsersModule, AuthModule, PrismaService, JwtModule],
-      providers: [AuthService, UsersService, PrismaService, JwtModule],
+      imports: [
+        UsersModule,
+        AuthModule,
+        PrismaService,
+        ConfigModule,
+        JwtModule.registerAsync({
+          imports: [ConfigModule],
+          useFactory: (configService: ConfigService) => {
+            return {
+              secret: configService.get<string>('JWT_SECRET'),
+              signOptions: { expiresIn: configService.get<string>('JWT_EXP') },
+            };
+          },
+          inject: [ConfigService],
+        }),
+      ],
+      providers: [AuthService, PrismaService, JwtStrategy],
     }).compile();
 
     authService = module.get<AuthService>(AuthService);
@@ -25,7 +42,7 @@ describe('AuthService', () => {
         username: 'anaC',
         fullName: 'Ana Castillo',
         email: 'example123@mail.com',
-        password: 'pass123',
+        password: 'password',
         hashActivation: '123456',
       },
     });
@@ -36,9 +53,19 @@ describe('AuthService', () => {
   });
 
   describe('log in user', () => {
+    /* it('should return the order after buying of a user', async () => {
+      const user = await authService.login('example123@mail.com', 'password');
+      expect(user).toHaveProperty('access_token');
+    }); */
     it('should return the order after buying of a user', async () => {
-      const user = await authService.login('example123@mail.com', 'pass123');
-      console.log(user);
+      await expect(
+        authService.login('wrongEmail@mail.com', 'wrongPassword'),
+      ).rejects.toThrow('User not found');
+    });
+    it('should return the order after buying of a user', async () => {
+      await expect(
+        authService.login('example123@mail.com', 'wrongPassword'),
+      ).rejects.toThrow('Invalid credentials');
     });
   });
 

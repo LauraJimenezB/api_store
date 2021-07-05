@@ -22,7 +22,7 @@ export class AuthController {
 
   @Post('login')
   login(@Body() loginUser: LogInUserDto) {
-    return this.authService.login(loginUser);
+    return this.authService.login(loginUser.email, loginUser.password);
   }
 
   @ApiBearerAuth('access-token')
