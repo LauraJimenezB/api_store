@@ -17,7 +17,7 @@ import { CartQuantityDto } from './dto/cart-quantity.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
-import { Roles } from '../users/roles/role.decorator';
+import { Roles } from '../auth/roles/role.decorator';
 import { AttachmentsService } from '../attachments/services/attachments.service';
 import { ContentTypeDto } from './dto/content-type.dto';
 

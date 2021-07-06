@@ -1,7 +1,5 @@
-import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { AuthModule } from 'src/auth/auth.module';
 import { PrismaService } from '../common/services/prisma.service';
 import { UsersService } from './users.service';
 
@@ -96,7 +94,7 @@ describe('UsersService', () => {
     it('should return a user', async () => {
       const user = await userService.setAdminRole(1, 2);
       expect(user.username).toBe('Ana1246');
-      expect(user.roles).toContain('Manager');
+      expect(user.roles).toContain('MANAGER');
     });
     it('should throw an error when user does not exists in the database', async () => {
       await expect(userService.setAdminRole(6, 2)).rejects.toThrow(

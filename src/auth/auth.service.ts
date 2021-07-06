@@ -1,6 +1,4 @@
 import {
-  forwardRef,
-  Inject,
   Injectable,
   NotAcceptableException,
   NotFoundException,
@@ -17,6 +15,7 @@ import { sendEmailToken } from '../common/services/sendgrid.service';
 import { ConfirmedUserDto } from './dto/confirmed-user.dto';
 import { UserDto } from '../users/dto/user.dto';
 import { UnauthorizedException } from '@nestjs/common';
+import { LogInUserDto } from './dto/login-user.dto';
 
 function validatePassword(
   plainTextPassword: string,
@@ -46,7 +45,7 @@ export class AuthService {
     return await this.usersService.get(id);
   }
 
-  async login(loginUser) {
+  async login(loginUser: LogInUserDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: loginUser.email },
     });

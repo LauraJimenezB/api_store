@@ -6,8 +6,8 @@ import { ProductsModule } from './products/products.module';
 import { CommonModule } from './common/common.module';
 import { OrdersModule } from './orders/orders.module';
 import { APP_GUARD } from '@nestjs/core';
-import { RoleGuard } from './users/roles/guard/roles.guard';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { RoleGuard } from './auth/guards/roles.guard';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [

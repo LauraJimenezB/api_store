@@ -3,6 +3,7 @@ import { PrismaService } from '../common/services/prisma.service';
 import { plainToClass } from 'class-transformer';
 import { User } from './entities/users.entity';
 import { UserDto } from './dto/user.dto';
+import { RolesNameEnum } from '../auth/enums/roles.enum';
 
 @Injectable()
 export class UsersService {
@@ -11,6 +12,19 @@ export class UsersService {
   async getAllUsers(): Promise<UserDto[]> {
     const users = await this.prisma.user.findMany({});
     return plainToClass(UserDto, users);
+  }
+
+  async getUserRoles(userId: number): Promise<number[]> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        roles: true,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+    return user.roles.map((userRole) => userRole.roleId);
   }
 
   async get(userId: number): Promise<UserDto> {
@@ -93,7 +107,7 @@ export class UsersService {
       where: { userId: userId },
     });
     const roles = getRole.map((role) =>
-      role.roleId === 1 ? 'Client' : 'Manager',
+      role.roleId === 1 ? RolesNameEnum.CLIENT : RolesNameEnum.MANAGER,
     );
     userWithRole.roles = roles;
     return userWithRole;
