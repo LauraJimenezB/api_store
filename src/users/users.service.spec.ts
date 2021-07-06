@@ -1,6 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { AuthModule } from 'src/auth/auth.module';
 import { PrismaService } from '../common/services/prisma.service';
 import { UsersService } from './users.service';
 
@@ -36,6 +37,18 @@ describe('UsersService', () => {
           password: 'pass456',
           hashActivation: '456789',
         },
+      ],
+    });
+
+    //create roles
+    await prismaService.role.createMany({
+      data: [{ name: 'CLIENT' }, { name: 'MANAGER' }],
+    });
+
+    await prismaService.userRole.createMany({
+      data: [
+        { userId: 1, roleId: 1 },
+        { userId: 2, roleId: 1 },
       ],
     });
   });
@@ -81,13 +94,12 @@ describe('UsersService', () => {
 
   describe('set role to user', () => {
     it('should return a user', async () => {
-      const user = await userService.setAdminRole(1);
-      console.log(user);
+      const user = await userService.setAdminRole(1, 2);
       expect(user.username).toBe('Ana1246');
       expect(user.roles).toContain('Manager');
     });
     it('should throw an error when user does not exists in the database', async () => {
-      await expect(userService.setAdminRole(6)).rejects.toThrow(
+      await expect(userService.setAdminRole(6, 2)).rejects.toThrow(
         'User not found',
       );
     });
@@ -95,9 +107,9 @@ describe('UsersService', () => {
 
   describe('delete user', () => {
     it('should return the deleted user', async () => {
-      const user = await userService.delete(2);
-      expect(user.fullName).toBe('Martin Gonzales');
-      expect(user.email).toBe('martin456@mail.com');
+      await userService.delete(1);
+      const allUsers = await userService.getAllUsers();
+      expect(allUsers).toHaveLength(1);
     });
     it('should throw an error when user does not exists in the database', async () => {
       await expect(userService.delete(6)).rejects.toThrowError(

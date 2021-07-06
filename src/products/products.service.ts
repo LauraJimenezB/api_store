@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Category } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
-import { AttachmentDto } from 'src/attachments/dto/attachment.dto';
+import { AttachmentDto } from '../attachments/dto/attachment.dto';
 import { AttachmentsService } from '../attachments/services/attachments.service';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PrismaService } from '../common/services/prisma.service';

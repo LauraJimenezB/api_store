@@ -28,7 +28,7 @@ export class CreateUserDto {
   @ApiProperty({ description: 'First name and last name of user.' })
   @IsString()
   @IsNotEmpty({
-    message: 'Fullname is required',
+    message: 'fullName is required',
   })
-  fullname: string;
+  fullName: string;
 }

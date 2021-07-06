@@ -5,7 +5,7 @@ export class ConfirmedUserDto {
   id: number;
   username: string;
   email: string;
-  fullname: string;
+  fullName: string;
 
   @ApiHideProperty()
   roles: string[];
