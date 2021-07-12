@@ -1,6 +1,4 @@
 import {
-  forwardRef,
-  Inject,
   Injectable,
   NotAcceptableException,
   NotFoundException,
@@ -17,6 +15,7 @@ import { sendEmailToken } from '../common/services/sendgrid.service';
 import { ConfirmedUserDto } from './dto/confirmed-user.dto';
 import { UserDto } from '../users/dto/user.dto';
 import { UnauthorizedException } from '@nestjs/common';
+import { LogInUserDto } from './dto/login-user.dto';
 
 function validatePassword(
   plainTextPassword: string,
@@ -46,7 +45,7 @@ export class AuthService {
     return await this.usersService.get(id);
   }
 
-  async login(loginUser) {
+  async login(loginUser: LogInUserDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: loginUser.email },
     });
@@ -57,12 +56,6 @@ export class AuthService {
     if (!validPassword) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    await this.prisma.user.update({
-      where: { email: loginUser.email },
-      data: {
-        active: true,
-      },
-    });
     const userRoles = await this.prisma.userRole.findMany({
       where: { userId: user.id },
     });
@@ -82,12 +75,6 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    await this.prisma.user.update({
-      where: { id },
-      data: {
-        active: false,
-      },
-    });
   }
 
   async signup(user: CreateUserDto): Promise<void> {
@@ -112,7 +99,6 @@ export class AuthService {
         email: user.email,
         password: hash,
         hashActivation: emailToken,
-        active: true,
       },
     });
     const getUser = await this.prisma.user.findUnique({

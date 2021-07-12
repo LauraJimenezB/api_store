@@ -6,15 +6,19 @@ export class UserDto {
   email: string;
   fullName: string;
   roles: string[];
+
   @Exclude()
   password: string;
+
   @Exclude()
   emailVerified: boolean;
+
   @Exclude()
   hashActivation: string;
-  active: boolean;
+
   @Exclude()
   createdAt: string;
+
   @Exclude()
   confirmedAt: string;
 }

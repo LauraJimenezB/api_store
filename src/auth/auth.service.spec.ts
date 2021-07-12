@@ -42,7 +42,8 @@ describe('AuthService', () => {
         username: 'anaC',
         fullName: 'Ana Castillo',
         email: 'example123@mail.com',
-        password: 'password',
+        password:
+          '$2b$10$27JxEyUyLL6cRBRyaqSk5u94sQjHR0uG35CGnxp/dGNKp.o61.dwm',
         hashActivation: '123456',
       },
     });
@@ -53,18 +54,18 @@ describe('AuthService', () => {
   });
 
   describe('log in user', () => {
-    /* const loginDto = {
+    const loginDto = {
       email: 'example123@mail.com',
-      password: 'password',
+      password: 'pass123',
     };
     it('should return the token if the credentials are correct', async () => {
       const user = await authService.login(loginDto);
       expect(user).toHaveProperty('access_token');
-    }); */
+    });
     it('should return error of wrong user', async () => {
       const loginDto: LogInUserDto = {
         email: 'wrongEmail@mail.com',
-        password: 'password',
+        password: 'pass123',
       };
       await expect(authService.login(loginDto)).rejects.toThrow(
         'User not found',

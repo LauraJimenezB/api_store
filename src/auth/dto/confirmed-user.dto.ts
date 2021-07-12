@@ -24,10 +24,6 @@ export class ConfirmedUserDto {
 
   @ApiHideProperty()
   @Exclude()
-  active: boolean;
-
-  @ApiHideProperty()
-  @Exclude()
   createdAt: string;
 
   @ApiHideProperty()
